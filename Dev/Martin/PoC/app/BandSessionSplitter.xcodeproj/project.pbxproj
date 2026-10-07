@@ -1,0 +1,561 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		111C8CF707DBEFB985A10F9F /* FeedbackClustering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186721708A4F3B9E4FEB2CDF /* FeedbackClustering.swift */; };
+		1738889C40C9A199080874E5 /* DeviceRole.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C0543ED759C2BD3445BFF31 /* DeviceRole.swift */; };
+		2D8D8839949560EA7B7BD60D /* WaveformLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B42D7A4B9653A7139F439221 /* WaveformLoader.swift */; };
+		3FDD779971B0AEDCE8909B45 /* SoundSynth.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE7F0111C01777A64B818483 /* SoundSynth.swift */; };
+		41A6463F226A4BB899A145AB /* SyncStatusLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B45B67460DE736A1F5C35CC /* SyncStatusLabel.swift */; };
+		438E75346663A28A0148BFA0 /* 항해.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 66D96A9E1E948E32BFE124EA /* 항해.pdf */; };
+		44D4D98703DE0F2804A92D26 /* TeamViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C86942D002F6B8730248074 /* TeamViews.swift */; };
+		4A8A34AC152107919A466D74 /* FeedbackStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37B118E37F8FA39E7E47F22 /* FeedbackStore.swift */; };
+		4BE9C2735D9912B8CDF9A1F9 /* TrackLane.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE9C32A5A782721E18BF0C15 /* TrackLane.swift */; };
+		4FF5AB0631E80403C1A3533F /* CoverageMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15E8443280C68B58A0E138A5 /* CoverageMap.swift */; };
+		5F2470EA875B303A294A035F /* ScoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA0C8ECD02D03C7D1333881 /* ScoreView.swift */; };
+		631BA121AF58F998B1B6F805 /* GarageBandStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2BFCC685DDAC031BA8155C /* GarageBandStyle.swift */; };
+		63E9A7D5436D09991DAF64E4 /* StemPlayerController+Editing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28DA0277EB614E7F21B663B6 /* StemPlayerController+Editing.swift */; };
+		72E9FE500A3F9DECFF4A7F7A /* ScoreSyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6E7E1BA94B843A9D42F92C /* ScoreSyncController.swift */; };
+		748AAE10DFF026AA185B03EB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586D48EF7F078DFAB711F6C8 /* ContentView.swift */; };
+		7D6AE8A2B10FF4C2D9DF2DBD /* PatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C42281773E3D3AAC70915B /* PatchStore.swift */; };
+		8363DE2254C5FB94DD47AED7 /* TrackHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B8E783D11AB20496198DBF /* TrackHeader.swift */; };
+		8763F7D739109FC025157AE7 /* VariantViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F1967D677221595BC24498 /* VariantViews.swift */; };
+		88BB43DF9F191AB9254D1C28 /* AppVariant.swift in Sources */ = {isa = PBXBuildFile; fileRef = D50A2DB5F18FEE5262F614CD /* AppVariant.swift */; };
+		8BAD07D68E5E84E13002E698 /* FeedbackComposerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5614986567F2FE09884A59F4 /* FeedbackComposerSheet.swift */; };
+		8EDB70600CB50732479D2D07 /* RegionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4814BD0E1019AEEC01E0996D /* RegionStore.swift */; };
+		95EDDFA178708674056A5356 /* SeparationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6814D1D2999A8953F555C86 /* SeparationService.swift */; };
+		A234F797AEEA554F07AE2592 /* SessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912FC64E9F0160794C39FB54 /* SessionViewModel.swift */; };
+		ADC57133BF50AF516C0BA005 /* StemPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA089B24568C3A967F6BFC7 /* StemPlayerView.swift */; };
+		B094BBA6EAB19E6BE4F31051 /* StemTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3E79BD2D5868F2A6E723141 /* StemTrack.swift */; };
+		BCD69860D47DEE21CC7E3AA0 /* StemPlayerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9469E74297CC65AB19111028 /* StemPlayerController.swift */; };
+		BFCBA39D8C0D4F7C2E79EB49 /* PracticeSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A63A11A08AA494F02E81BCA /* PracticeSession.swift */; };
+		C5A38CAFF954A2E68716E9CD /* StemPlayerController+Recording.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288864AC84923D0E85D04F43 /* StemPlayerController+Recording.swift */; };
+		C76437C33EB96FF459641559 /* FeedbackBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF3A33777161A38D640BF0B /* FeedbackBoardView.swift */; };
+		CF3380C5CCA2EB5539746887 /* Wording.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F65CD77A7A1C10DB5114415 /* Wording.swift */; };
+		D7C80E4DC942C42680D153C8 /* RevealSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25B43982D35F224414140EF1 /* RevealSession.swift */; };
+		E01B13A008378C17234B10A2 /* TimelineEditing.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4378258768660C00ABE52D1 /* TimelineEditing.swift */; };
+		E410CE0862F6C9DFB6AA2E01 /* PracticeViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C431D11BA246DDD06AACD0 /* PracticeViews.swift */; };
+		EAF33D1D17AC782FF8AF2408 /* BandModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8120B9B0BBECFFCABAA7465 /* BandModels.swift */; };
+		F28F77D496E3FF9628F05E86 /* SyncClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8ED88AAE255D85BE2D1965 /* SyncClient.swift */; };
+		F79B033C1A7595E5A9E97B85 /* FeedbackThreadSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60356CAD982DE9546E3391AA /* FeedbackThreadSheet.swift */; };
+		F89CAE23E29E9261D2D5969D /* DailyPick.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6B1E2D15147D9A7655F3F4 /* DailyPick.swift */; };
+		FD15210C7AD846B9742768B5 /* BandSessionSplitterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA9A50611664433B78F0622 /* BandSessionSplitterApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0C86942D002F6B8730248074 /* TeamViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamViews.swift; sourceTree = "<group>"; };
+		15E8443280C68B58A0E138A5 /* CoverageMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverageMap.swift; sourceTree = "<group>"; };
+		186721708A4F3B9E4FEB2CDF /* FeedbackClustering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackClustering.swift; sourceTree = "<group>"; };
+		25B43982D35F224414140EF1 /* RevealSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevealSession.swift; sourceTree = "<group>"; };
+		288864AC84923D0E85D04F43 /* StemPlayerController+Recording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StemPlayerController+Recording.swift"; sourceTree = "<group>"; };
+		28DA0277EB614E7F21B663B6 /* StemPlayerController+Editing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StemPlayerController+Editing.swift"; sourceTree = "<group>"; };
+		2C0543ED759C2BD3445BFF31 /* DeviceRole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceRole.swift; sourceTree = "<group>"; };
+		31C42281773E3D3AAC70915B /* PatchStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatchStore.swift; sourceTree = "<group>"; };
+		3A63A11A08AA494F02E81BCA /* PracticeSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeSession.swift; sourceTree = "<group>"; };
+		3AA9A50611664433B78F0622 /* BandSessionSplitterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandSessionSplitterApp.swift; sourceTree = "<group>"; };
+		3D8ED88AAE255D85BE2D1965 /* SyncClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncClient.swift; sourceTree = "<group>"; };
+		4814BD0E1019AEEC01E0996D /* RegionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionStore.swift; sourceTree = "<group>"; };
+		4B9DC44B1F15231259999985 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		5614986567F2FE09884A59F4 /* FeedbackComposerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackComposerSheet.swift; sourceTree = "<group>"; };
+		586D48EF7F078DFAB711F6C8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		60356CAD982DE9546E3391AA /* FeedbackThreadSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackThreadSheet.swift; sourceTree = "<group>"; };
+		66D96A9E1E948E32BFE124EA /* 항해.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "항해.pdf"; sourceTree = "<group>"; };
+		7BA089B24568C3A967F6BFC7 /* StemPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StemPlayerView.swift; sourceTree = "<group>"; };
+		7F65CD77A7A1C10DB5114415 /* Wording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wording.swift; sourceTree = "<group>"; };
+		912FC64E9F0160794C39FB54 /* SessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionViewModel.swift; sourceTree = "<group>"; };
+		9469E74297CC65AB19111028 /* StemPlayerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StemPlayerController.swift; sourceTree = "<group>"; };
+		9B45B67460DE736A1F5C35CC /* SyncStatusLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusLabel.swift; sourceTree = "<group>"; };
+		A37B118E37F8FA39E7E47F22 /* FeedbackStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackStore.swift; sourceTree = "<group>"; };
+		A3E79BD2D5868F2A6E723141 /* StemTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StemTrack.swift; sourceTree = "<group>"; };
+		ABF3A33777161A38D640BF0B /* FeedbackBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackBoardView.swift; sourceTree = "<group>"; };
+		B42D7A4B9653A7139F439221 /* WaveformLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformLoader.swift; sourceTree = "<group>"; };
+		B8120B9B0BBECFFCABAA7465 /* BandModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandModels.swift; sourceTree = "<group>"; };
+		BA78F0627BBD2A9161D140C0 /* BandSessionSplitter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BandSessionSplitter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB2BFCC685DDAC031BA8155C /* GarageBandStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarageBandStyle.swift; sourceTree = "<group>"; };
+		BE7F0111C01777A64B818483 /* SoundSynth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundSynth.swift; sourceTree = "<group>"; };
+		BEA0C8ECD02D03C7D1333881 /* ScoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreView.swift; sourceTree = "<group>"; };
+		C4378258768660C00ABE52D1 /* TimelineEditing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEditing.swift; sourceTree = "<group>"; };
+		D50A2DB5F18FEE5262F614CD /* AppVariant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVariant.swift; sourceTree = "<group>"; };
+		D7F1967D677221595BC24498 /* VariantViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariantViews.swift; sourceTree = "<group>"; };
+		E0B8E783D11AB20496198DBF /* TrackHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackHeader.swift; sourceTree = "<group>"; };
+		E3C431D11BA246DDD06AACD0 /* PracticeViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeViews.swift; sourceTree = "<group>"; };
+		E6814D1D2999A8953F555C86 /* SeparationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeparationService.swift; sourceTree = "<group>"; };
+		EA6B1E2D15147D9A7655F3F4 /* DailyPick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPick.swift; sourceTree = "<group>"; };
+		FE9C32A5A782721E18BF0C15 /* TrackLane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackLane.swift; sourceTree = "<group>"; };
+		FF6E7E1BA94B843A9D42F92C /* ScoreSyncController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreSyncController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		098D2988E7147D4EDB5772A4 /* Score */ = {
+			isa = PBXGroup;
+			children = (
+				FF6E7E1BA94B843A9D42F92C /* ScoreSyncController.swift */,
+				BEA0C8ECD02D03C7D1333881 /* ScoreView.swift */,
+			);
+			path = Score;
+			sourceTree = "<group>";
+		};
+		13410A303D5F6BEC1C89406F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BB2BFCC685DDAC031BA8155C /* GarageBandStyle.swift */,
+				7BA089B24568C3A967F6BFC7 /* StemPlayerView.swift */,
+				E0B8E783D11AB20496198DBF /* TrackHeader.swift */,
+				FE9C32A5A782721E18BF0C15 /* TrackLane.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		24531B08B8B21342799EAA10 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				A3E79BD2D5868F2A6E723141 /* StemTrack.swift */,
+				C4378258768660C00ABE52D1 /* TimelineEditing.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		30EC8D784D5D4CF0DD363780 /* Separation */ = {
+			isa = PBXGroup;
+			children = (
+				E6814D1D2999A8953F555C86 /* SeparationService.swift */,
+				912FC64E9F0160794C39FB54 /* SessionViewModel.swift */,
+			);
+			path = Separation;
+			sourceTree = "<group>";
+		};
+		3187F7BA89DF22E839569829 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				3AA9A50611664433B78F0622 /* BandSessionSplitterApp.swift */,
+				586D48EF7F078DFAB711F6C8 /* ContentView.swift */,
+				4B9DC44B1F15231259999985 /* Info.plist */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		4E87D1430F2D2B345123E809 /* BandSessionSplitter */ = {
+			isa = PBXGroup;
+			children = (
+				3187F7BA89DF22E839569829 /* App */,
+				BC291C7D7FEE0291AB563D53 /* Features */,
+				D71E92E8C84B17BE23AAAFF1 /* Resources */,
+			);
+			path = BandSessionSplitter;
+			sourceTree = "<group>";
+		};
+		57334A3B1085B051E4DB6410 /* Variants */ = {
+			isa = PBXGroup;
+			children = (
+				D50A2DB5F18FEE5262F614CD /* AppVariant.swift */,
+				B8120B9B0BBECFFCABAA7465 /* BandModels.swift */,
+				15E8443280C68B58A0E138A5 /* CoverageMap.swift */,
+				25B43982D35F224414140EF1 /* RevealSession.swift */,
+				0C86942D002F6B8730248074 /* TeamViews.swift */,
+				D7F1967D677221595BC24498 /* VariantViews.swift */,
+				7F65CD77A7A1C10DB5114415 /* Wording.swift */,
+			);
+			path = Variants;
+			sourceTree = "<group>";
+		};
+		897BFAB4379C9E6E9B2CE850 /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				2C0543ED759C2BD3445BFF31 /* DeviceRole.swift */,
+				3D8ED88AAE255D85BE2D1965 /* SyncClient.swift */,
+				9B45B67460DE736A1F5C35CC /* SyncStatusLabel.swift */,
+			);
+			path = Sync;
+			sourceTree = "<group>";
+		};
+		A171BAC3E3A885AFDC93B1C2 /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				E5CC2D4546D3A06A6F1E31B0 /* Audio */,
+				24531B08B8B21342799EAA10 /* Model */,
+				A8365661A9F9B3CB11AF5377 /* Storage */,
+				13410A303D5F6BEC1C89406F /* Views */,
+			);
+			path = Player;
+			sourceTree = "<group>";
+		};
+		A5739268638BAEC3F9766368 = {
+			isa = PBXGroup;
+			children = (
+				4E87D1430F2D2B345123E809 /* BandSessionSplitter */,
+				B0358D183EC183A5DEE0E7C8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A8365661A9F9B3CB11AF5377 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				31C42281773E3D3AAC70915B /* PatchStore.swift */,
+				4814BD0E1019AEEC01E0996D /* RegionStore.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		B0358D183EC183A5DEE0E7C8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BA78F0627BBD2A9161D140C0 /* BandSessionSplitter.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BC291C7D7FEE0291AB563D53 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				DA36AB07BCFCEE4171F71428 /* Feedback */,
+				A171BAC3E3A885AFDC93B1C2 /* Player */,
+				C6EDC5CB052DA1B39F9E275F /* Practice */,
+				098D2988E7147D4EDB5772A4 /* Score */,
+				30EC8D784D5D4CF0DD363780 /* Separation */,
+				897BFAB4379C9E6E9B2CE850 /* Sync */,
+				57334A3B1085B051E4DB6410 /* Variants */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		C6EDC5CB052DA1B39F9E275F /* Practice */ = {
+			isa = PBXGroup;
+			children = (
+				EA6B1E2D15147D9A7655F3F4 /* DailyPick.swift */,
+				3A63A11A08AA494F02E81BCA /* PracticeSession.swift */,
+				E3C431D11BA246DDD06AACD0 /* PracticeViews.swift */,
+				BE7F0111C01777A64B818483 /* SoundSynth.swift */,
+			);
+			path = Practice;
+			sourceTree = "<group>";
+		};
+		D71E92E8C84B17BE23AAAFF1 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				66D96A9E1E948E32BFE124EA /* 항해.pdf */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		DA36AB07BCFCEE4171F71428 /* Feedback */ = {
+			isa = PBXGroup;
+			children = (
+				ABF3A33777161A38D640BF0B /* FeedbackBoardView.swift */,
+				186721708A4F3B9E4FEB2CDF /* FeedbackClustering.swift */,
+				5614986567F2FE09884A59F4 /* FeedbackComposerSheet.swift */,
+				A37B118E37F8FA39E7E47F22 /* FeedbackStore.swift */,
+				60356CAD982DE9546E3391AA /* FeedbackThreadSheet.swift */,
+			);
+			path = Feedback;
+			sourceTree = "<group>";
+		};
+		E5CC2D4546D3A06A6F1E31B0 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				9469E74297CC65AB19111028 /* StemPlayerController.swift */,
+				28DA0277EB614E7F21B663B6 /* StemPlayerController+Editing.swift */,
+				288864AC84923D0E85D04F43 /* StemPlayerController+Recording.swift */,
+				B42D7A4B9653A7139F439221 /* WaveformLoader.swift */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A00A2F849435FF11C02322C6 /* BandSessionSplitter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 374730E1B4BC3CE6DF27FAD5 /* Build configuration list for PBXNativeTarget "BandSessionSplitter" */;
+			buildPhases = (
+				D132C8A722C47F12501E0C2D /* Sources */,
+				F1CEB25B16912F94C1D40ED0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BandSessionSplitter;
+			packageProductDependencies = (
+			);
+			productName = BandSessionSplitter;
+			productReference = BA78F0627BBD2A9161D140C0 /* BandSessionSplitter.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		32904035BD4CC86A1F271D26 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = 09162414950AB57E0B649478 /* Build configuration list for PBXProject "BandSessionSplitter" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = A5739268638BAEC3F9766368;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = B0358D183EC183A5DEE0E7C8 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A00A2F849435FF11C02322C6 /* BandSessionSplitter */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F1CEB25B16912F94C1D40ED0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				438E75346663A28A0148BFA0 /* 항해.pdf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D132C8A722C47F12501E0C2D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				88BB43DF9F191AB9254D1C28 /* AppVariant.swift in Sources */,
+				EAF33D1D17AC782FF8AF2408 /* BandModels.swift in Sources */,
+				FD15210C7AD846B9742768B5 /* BandSessionSplitterApp.swift in Sources */,
+				748AAE10DFF026AA185B03EB /* ContentView.swift in Sources */,
+				4FF5AB0631E80403C1A3533F /* CoverageMap.swift in Sources */,
+				F89CAE23E29E9261D2D5969D /* DailyPick.swift in Sources */,
+				1738889C40C9A199080874E5 /* DeviceRole.swift in Sources */,
+				C76437C33EB96FF459641559 /* FeedbackBoardView.swift in Sources */,
+				111C8CF707DBEFB985A10F9F /* FeedbackClustering.swift in Sources */,
+				8BAD07D68E5E84E13002E698 /* FeedbackComposerSheet.swift in Sources */,
+				4A8A34AC152107919A466D74 /* FeedbackStore.swift in Sources */,
+				F79B033C1A7595E5A9E97B85 /* FeedbackThreadSheet.swift in Sources */,
+				631BA121AF58F998B1B6F805 /* GarageBandStyle.swift in Sources */,
+				7D6AE8A2B10FF4C2D9DF2DBD /* PatchStore.swift in Sources */,
+				BFCBA39D8C0D4F7C2E79EB49 /* PracticeSession.swift in Sources */,
+				E410CE0862F6C9DFB6AA2E01 /* PracticeViews.swift in Sources */,
+				8EDB70600CB50732479D2D07 /* RegionStore.swift in Sources */,
+				D7C80E4DC942C42680D153C8 /* RevealSession.swift in Sources */,
+				72E9FE500A3F9DECFF4A7F7A /* ScoreSyncController.swift in Sources */,
+				5F2470EA875B303A294A035F /* ScoreView.swift in Sources */,
+				95EDDFA178708674056A5356 /* SeparationService.swift in Sources */,
+				A234F797AEEA554F07AE2592 /* SessionViewModel.swift in Sources */,
+				3FDD779971B0AEDCE8909B45 /* SoundSynth.swift in Sources */,
+				63E9A7D5436D09991DAF64E4 /* StemPlayerController+Editing.swift in Sources */,
+				C5A38CAFF954A2E68716E9CD /* StemPlayerController+Recording.swift in Sources */,
+				BCD69860D47DEE21CC7E3AA0 /* StemPlayerController.swift in Sources */,
+				ADC57133BF50AF516C0BA005 /* StemPlayerView.swift in Sources */,
+				B094BBA6EAB19E6BE4F31051 /* StemTrack.swift in Sources */,
+				F28F77D496E3FF9628F05E86 /* SyncClient.swift in Sources */,
+				41A6463F226A4BB899A145AB /* SyncStatusLabel.swift in Sources */,
+				44D4D98703DE0F2804A92D26 /* TeamViews.swift in Sources */,
+				E01B13A008378C17234B10A2 /* TimelineEditing.swift in Sources */,
+				8363DE2254C5FB94DD47AED7 /* TrackHeader.swift in Sources */,
+				4BE9C2735D9912B8CDF9A1F9 /* TrackLane.swift in Sources */,
+				8763F7D739109FC025157AE7 /* VariantViews.swift in Sources */,
+				2D8D8839949560EA7B7BD60D /* WaveformLoader.swift in Sources */,
+				CF3380C5CCA2EB5539746887 /* Wording.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		231C7A23F59B983A998DCB0F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		8752C29D71CABF4B48ECA217 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C99M4QH957;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BandSessionSplitter/App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.poc.bandsession.BandSessionSplitter;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Release;
+		};
+		91C28F2571912BB5BD27D044 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		97DF9F45D8FC7DEE12B6A5CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C99M4QH957;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BandSessionSplitter/App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.poc.bandsession.BandSessionSplitter;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		09162414950AB57E0B649478 /* Build configuration list for PBXProject "BandSessionSplitter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				91C28F2571912BB5BD27D044 /* Debug */,
+				231C7A23F59B983A998DCB0F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		374730E1B4BC3CE6DF27FAD5 /* Build configuration list for PBXNativeTarget "BandSessionSplitter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				97DF9F45D8FC7DEE12B6A5CF /* Debug */,
+				8752C29D71CABF4B48ECA217 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 32904035BD4CC86A1F271D26 /* Project object */;
+}
