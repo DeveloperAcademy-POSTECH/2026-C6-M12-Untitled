@@ -1,7 +1,7 @@
 name: "Fix: 버그 수정"
 description: 버그를 고칠 때 사용합니다.
 title: "[Fix] "
-labels: ["fix"]
+labels: ["🐛 fix"]
 body:
   - type: textarea
     id: bug

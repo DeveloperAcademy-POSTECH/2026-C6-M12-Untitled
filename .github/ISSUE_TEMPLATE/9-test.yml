@@ -1,7 +1,7 @@
 name: "Test: 테스트 코드 작성 및 수정"
 description: 테스트 코드를 작성하거나 수정할 때 사용합니다.
 title: "[Test] "
-labels: ["test"]
+labels: ["🧪 test"]
 body:
   - type: textarea
     id: summary
