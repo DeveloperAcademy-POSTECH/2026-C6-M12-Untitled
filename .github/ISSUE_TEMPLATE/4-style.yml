@@ -1,7 +1,7 @@
 name: "Style: UI 작업"
 description: 화면 · 디자인을 작업할 때 사용합니다.
 title: "[Style] "
-labels: ["Style"]
+labels: ["style"]
 body:
   - type: textarea
     id: summary

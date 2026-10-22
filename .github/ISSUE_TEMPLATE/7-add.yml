@@ -1,7 +1,7 @@
 name: "Add: 파일, 에셋 추가"
 description: 이미지 · 아이콘 · 소리 등 파일을 추가할 때 사용합니다.
 title: "[Add] "
-labels: ["Add"]
+labels: ["add"]
 body:
   - type: textarea
     id: files

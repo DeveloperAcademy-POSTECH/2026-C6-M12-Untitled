@@ -1,7 +1,7 @@
 name: "Refactor: 코드 리팩토링"
 description: 동작은 그대로 두고 코드 구조를 바꿀 때 사용합니다.
 title: "[Refactor] "
-labels: ["Refactor"]
+labels: ["refactor"]
 body:
   - type: textarea
     id: reason
