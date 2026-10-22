@@ -1,0 +1,12 @@
+name: "Add: 파일, 에셋 추가"
+description: 이미지 · 아이콘 · 소리 등 파일을 추가할 때 사용합니다.
+title: "[Add] "
+labels: ["Add"]
+body:
+  - type: textarea
+    id: files
+    attributes:
+      label: 무엇을 추가하나요?
+      placeholder: 예) 카운트인 · 메트로놈 클릭 소리 (Resources/Sounds)
+    validations:
+      required: true

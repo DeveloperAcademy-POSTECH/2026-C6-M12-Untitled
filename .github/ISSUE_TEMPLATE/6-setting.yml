@@ -1,0 +1,19 @@
+name: "Setting: 프로젝트 세팅"
+description: 프로젝트 · 빌드 · 디렉토리 · 패키지 설정을 바꿀 때 사용합니다.
+title: "[Setting] "
+labels: ["Setting"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: 무엇을 세팅하나요?
+      placeholder: 예) 디렉토리 구조 세팅, TCA 패키지 추가
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 작업 항목
+      value: "- [ ] "
+    validations:
+      required: true

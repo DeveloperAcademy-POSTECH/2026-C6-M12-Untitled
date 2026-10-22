@@ -6,7 +6,7 @@
 
 - 작업할 기능에 대한 issue를 작성합니다.
 - issue 제목은 **[종류] 작업 명**으로 통일합니다. (ex. [Style] 온보딩 UI 구현)
-- 종류는 대문자로 시작합니다. (Add, Chore, Docs, Feat, Fix, Refactor, Style, Setting)
+- 종류는 대문자로 시작합니다. (Add, Chore, Docs, Feat, Fix, Refactor, Style, Setting, Test)
 - Assignees에는 작업을 맡은 사람을 태그합니다.
 - Labels에는 해당 작업과 맞는 유형을 태그합니다.
 - 설명란에는 어떤 작업을 할 예정인지, 관련된 이슈번호가 있는지, 참고한 내용이 있는지 등 필요한 내용을 적습니다.
@@ -60,6 +60,7 @@ ex) style: #12 로그인 버튼 컴포넌트 구현
 | refactor | 코드 리팩토링 | refactor: #11 SessionFeature 파일 분리 |
 | style | UI 작업 | style: #12 로그인 버튼 컴포넌트 구현 |
 | setting | 프로젝트 세팅 | setting: #2 디렉토리 구조 세팅 |
+| test | 테스트 코드 작성 및 수정 | test: #14 SessionFeature 테스트 추가 |
 
 ✹ Pull Request 제목 작성법
 

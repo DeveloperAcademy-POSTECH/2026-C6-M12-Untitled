@@ -1,0 +1,12 @@
+name: "Chore: 자잘한 코드 수정"
+description: 오타 · 이름 변경 등 작은 수정을 할 때 사용합니다.
+title: "[Chore] "
+labels: ["Chore"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: 무엇을 고치나요?
+      placeholder: 예) SepartionClient → SeparationClient 오타 수정
+    validations:
+      required: true

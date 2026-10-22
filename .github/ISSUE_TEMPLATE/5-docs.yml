@@ -1,0 +1,19 @@
+name: "Docs: 문서 작성 및 수정"
+description: README 등 문서를 작성 · 수정할 때 사용합니다.
+title: "[Docs] "
+labels: ["Docs"]
+body:
+  - type: input
+    id: target
+    attributes:
+      label: 어떤 문서인가요?
+      placeholder: 예) README.md
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 작업 항목
+      value: "- [ ] "
+    validations:
+      required: true

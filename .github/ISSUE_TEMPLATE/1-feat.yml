@@ -1,5 +1,5 @@
 name: "Feat: 기능 구현"
-description: 새 기능 · 화면(UI) · 파일/에셋 추가 등을 작업할 때 사용합니다.
+description: 새 기능을 구현할 때 사용합니다.
 title: "[Feat] "
 labels: ["Feat"]
 body:
@@ -7,7 +7,7 @@ body:
     id: summary
     attributes:
       label: 어떤 기능인가요?
-      placeholder: 예) SessionFeature 곡 올리기 흐름 구현 / PlayerView 믹서 UI 구현
+      placeholder: 예) SessionFeature 곡 올리기 흐름 구현
     validations:
       required: true
   - type: textarea
@@ -24,4 +24,4 @@ body:
     id: reference
     attributes:
       label: 참고 자료 (선택)
-      placeholder: 피그마 링크 · 다이어그램 · 추가할 에셋 등
+      placeholder: 피그마 클래스 다이어그램 · 시퀀스 다이어그램 링크 등

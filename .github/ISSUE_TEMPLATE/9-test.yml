@@ -1,0 +1,22 @@
+name: "Test: 테스트 코드 작성 및 수정"
+description: 테스트 코드를 작성하거나 수정할 때 사용합니다.
+title: "[Test] "
+labels: ["Test"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: 무엇을 테스트하나요?
+      placeholder: 예) SessionFeature 곡 업로드 흐름 테스트 추가
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 작업 항목
+      value: "- [ ] "
+      placeholder: |
+        - [ ] 업로드 성공 케이스
+        - [ ] 업로드 실패 케이스
+    validations:
+      required: true
