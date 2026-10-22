@@ -1,0 +1,35 @@
+name: "Fix: 버그 수정"
+description: 버그를 고칠 때 사용합니다.
+title: "[Fix] "
+labels: ["Fix"]
+body:
+  - type: textarea
+    id: bug
+    attributes:
+      label: 어떤 버그인가요?
+      placeholder: 예) 곡을 다시 열면 재생 위치가 처음으로 돌아가지 않음
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 어떻게 하면 생기나요? (선택)
+      placeholder: |
+        1. 곡 A를 열고 재생
+        2. 곡 B를 연 뒤 다시 곡 A를 엶
+        3. 재생 위치가 이전 위치에 남아 있음
+  - type: textarea
+    id: expected
+    attributes:
+      label: 원래 어떻게 되어야 하나요?
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: 테스트 환경 (선택)
+      placeholder: 예) iPad Pro 11, iPadOS 26
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: 스크린샷 · 로그 (선택)

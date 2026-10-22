@@ -1,0 +1,17 @@
+name: "Chore: 세팅 · 문서 · 자잘한 수정"
+description: 프로젝트 세팅, 문서 작성, 오타 · 이름 변경 등 작은 작업에 사용합니다.
+title: "[Chore] "
+labels: ["Chore"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: 무엇을 하나요?
+      placeholder: 예) TCA 패키지 추가 / README 협업 규칙 작성 / SepartionClient 오타 수정
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 작업 항목 (선택)
+      value: "- [ ] "
