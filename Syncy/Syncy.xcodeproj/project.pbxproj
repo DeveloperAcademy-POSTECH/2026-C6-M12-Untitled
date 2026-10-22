@@ -35,16 +35,6 @@
 			path = Syncy;
 			sourceTree = "<group>";
 		};
-		F1E84C7B308A1DAA00AE756D /* SyncyTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SyncyTests;
-			sourceTree = "<group>";
-		};
-		F1E84C85308A1DAA00AE756D /* SyncyUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SyncyUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,8 +60,6 @@
 			isa = PBXGroup;
 			children = (
 				F1E84C6D308A1DA900AE756D /* Syncy */,
-				F1E84C7B308A1DAA00AE756D /* SyncyTests */,
-				F1E84C85308A1DAA00AE756D /* SyncyUITests */,
 				F1E84C6C308A1DA900AE756D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -120,9 +108,6 @@
 			dependencies = (
 				F1E84C7A308A1DAA00AE756D /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				F1E84C7B308A1DAA00AE756D /* SyncyTests */,
-			);
 			name = SyncyTests;
 			productName = SyncyTests;
 			productReference = F1E84C78308A1DAA00AE756D /* SyncyTests.xctest */;
@@ -140,9 +125,6 @@
 			);
 			dependencies = (
 				F1E84C84308A1DAA00AE756D /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				F1E84C85308A1DAA00AE756D /* SyncyUITests */,
 			);
 			name = SyncyUITests;
 			productName = SyncyUITests;
