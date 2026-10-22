@@ -6,27 +6,12 @@
 	objectVersion = 110;
 	objects = {
 
-/* Begin PBXContainerItemProxy section */
-		F1E84C79308A1DAA00AE756D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F1E84C63308A1DA900AE756D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = F1E84C6A308A1DA900AE756D;
-			remoteInfo = Syncy;
-		};
-		F1E84C83308A1DAA00AE756D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F1E84C63308A1DA900AE756D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = F1E84C6A308A1DA900AE756D;
-			remoteInfo = Syncy;
-		};
-/* End PBXContainerItemProxy section */
+/* Begin PBXBuildFile section */
+		F133BD93308A29970020930F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = F133BD92308A29970020930F /* ComposableArchitecture */; };
+/* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		F1E84C6B308A1DA900AE756D /* Syncy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Syncy.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		F1E84C78308A1DAA00AE756D /* SyncyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SyncyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F1E84C82308A1DAA00AE756D /* SyncyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SyncyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -41,25 +26,24 @@
 		F1E84C68308A1DA900AE756D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
-			);
-		};
-		F1E84C75308A1DAA00AE756D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
-			);
-		};
-		F1E84C7F308A1DAA00AE756D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
+				F133BD93308A29970020930F /* ComposableArchitecture in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F133BD91308A29970020930F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F1E84C62308A1DA900AE756D = {
 			isa = PBXGroup;
 			children = (
 				F1E84C6D308A1DA900AE756D /* Syncy */,
+				F133BD91308A29970020930F /* Frameworks */,
 				F1E84C6C308A1DA900AE756D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -68,8 +52,6 @@
 			isa = PBXGroup;
 			children = (
 				F1E84C6B308A1DA900AE756D /* Syncy.app */,
-				F1E84C78308A1DAA00AE756D /* SyncyTests.xctest */,
-				F1E84C82308A1DAA00AE756D /* SyncyUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -91,45 +73,12 @@
 				F1E84C6D308A1DA900AE756D /* Syncy */,
 			);
 			name = Syncy;
+			packageProductDependencies = (
+				F133BD92308A29970020930F /* ComposableArchitecture */,
+			);
 			productName = Syncy;
 			productReference = F1E84C6B308A1DA900AE756D /* Syncy.app */;
 			productType = "com.apple.product-type.application";
-		};
-		F1E84C77308A1DAA00AE756D /* SyncyTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = F1E84C8D308A1DAA00AE756D /* Build configuration list for PBXNativeTarget "SyncyTests" */;
-			buildPhases = (
-				F1E84C74308A1DAA00AE756D /* Sources */,
-				F1E84C75308A1DAA00AE756D /* Frameworks */,
-				F1E84C76308A1DAA00AE756D /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				F1E84C7A308A1DAA00AE756D /* PBXTargetDependency */,
-			);
-			name = SyncyTests;
-			productName = SyncyTests;
-			productReference = F1E84C78308A1DAA00AE756D /* SyncyTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		F1E84C81308A1DAA00AE756D /* SyncyUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = F1E84C90308A1DAA00AE756D /* Build configuration list for PBXNativeTarget "SyncyUITests" */;
-			buildPhases = (
-				F1E84C7E308A1DAA00AE756D /* Sources */,
-				F1E84C7F308A1DAA00AE756D /* Frameworks */,
-				F1E84C80308A1DAA00AE756D /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				F1E84C84308A1DAA00AE756D /* PBXTargetDependency */,
-			);
-			name = SyncyUITests;
-			productName = SyncyUITests;
-			productReference = F1E84C82308A1DAA00AE756D /* SyncyUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
@@ -144,14 +93,6 @@
 					F1E84C6A308A1DA900AE756D = {
 						CreatedOnToolsVersion = 27.0;
 					};
-					F1E84C77308A1DAA00AE756D = {
-						CreatedOnToolsVersion = 27.0;
-						TestTargetID = F1E84C6A308A1DA900AE756D;
-					};
-					F1E84C81308A1DAA00AE756D = {
-						CreatedOnToolsVersion = 27.0;
-						TestTargetID = F1E84C6A308A1DA900AE756D;
-					};
 				};
 			};
 			buildConfigurationList = F1E84C66308A1DA900AE756D /* Build configuration list for PBXProject "Syncy" */;
@@ -163,30 +104,21 @@
 			);
 			mainGroup = F1E84C62308A1DA900AE756D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F17462DD308A28A9002CB20A /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F1E84C6C308A1DA900AE756D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				F1E84C6A308A1DA900AE756D /* Syncy */,
-				F1E84C77308A1DAA00AE756D /* SyncyTests */,
-				F1E84C81308A1DAA00AE756D /* SyncyUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		F1E84C69308A1DA900AE756D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			files = (
-			);
-		};
-		F1E84C76308A1DAA00AE756D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			files = (
-			);
-		};
-		F1E84C80308A1DAA00AE756D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -199,30 +131,7 @@
 			files = (
 			);
 		};
-		F1E84C74308A1DAA00AE756D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-			);
-		};
-		F1E84C7E308A1DAA00AE756D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-			);
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		F1E84C7A308A1DAA00AE756D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = F1E84C6A308A1DA900AE756D /* Syncy */;
-			targetProxy = F1E84C79308A1DAA00AE756D /* PBXContainerItemProxy */;
-		};
-		F1E84C84308A1DAA00AE756D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = F1E84C6A308A1DA900AE756D /* Syncy */;
-			targetProxy = F1E84C83308A1DAA00AE756D /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		F1E84C88308A1DAA00AE756D /* Debug configuration for PBXProject "Syncy" */ = {
@@ -410,90 +319,6 @@
 			};
 			name = Release;
 		};
-		F1E84C8E308A1DAA00AE756D /* Debug configuration for PBXNativeTarget "SyncyTests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M7F8AM92TP;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.syncy.SyncyTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Syncy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Syncy";
-			};
-			name = Debug;
-		};
-		F1E84C8F308A1DAA00AE756D /* Release configuration for PBXNativeTarget "SyncyTests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M7F8AM92TP;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.syncy.SyncyTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Syncy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Syncy";
-			};
-			name = Release;
-		};
-		F1E84C91308A1DAA00AE756D /* Debug configuration for PBXNativeTarget "SyncyUITests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M7F8AM92TP;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.syncy.SyncyUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Syncy;
-			};
-			name = Debug;
-		};
-		F1E84C92308A1DAA00AE756D /* Release configuration for PBXNativeTarget "SyncyUITests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M7F8AM92TP;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.syncy.SyncyUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Syncy;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -513,23 +338,26 @@
 			);
 			defaultConfigurationName = Release;
 		};
-		F1E84C8D308A1DAA00AE756D /* Build configuration list for PBXNativeTarget "SyncyTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				F1E84C8E308A1DAA00AE756D /* Debug configuration for PBXNativeTarget "SyncyTests" */,
-				F1E84C8F308A1DAA00AE756D /* Release configuration for PBXNativeTarget "SyncyTests" */,
-			);
-			defaultConfigurationName = Release;
-		};
-		F1E84C90308A1DAA00AE756D /* Build configuration list for PBXNativeTarget "SyncyUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				F1E84C91308A1DAA00AE756D /* Debug configuration for PBXNativeTarget "SyncyUITests" */,
-				F1E84C92308A1DAA00AE756D /* Release configuration for PBXNativeTarget "SyncyUITests" */,
-			);
-			defaultConfigurationName = Release;
-		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F17462DD308A28A9002CB20A /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.26.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F133BD92308A29970020930F /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F17462DD308A28A9002CB20A /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F1E84C63308A1DA900AE756D /* Project object */;
 	validationLevel = 1;
