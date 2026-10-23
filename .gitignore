@@ -8,7 +8,6 @@
 # CocoaPods - Only use to conserve bandwidth / Save time on Pushing
 #           - Also handy if you have a large number of dependant pods
 #           - AS PER https://guides.cocoapods.org/using/using-cocoapods.html NEVER IGNORE THE LOCK FILE
-Pods/
 
 ### macOS ###
 # General
@@ -91,6 +90,7 @@ playground.xcworkspace
 # .swiftpm
 
 .build/
+.swiftpm/
 
 # CocoaPods
 # We recommend against adding the Pods directory to your .gitignore. However
@@ -106,9 +106,6 @@ playground.xcworkspace
 
 Carthage/Build/
 
-# Accio dependency management
-Dependencies/
-.accio/
 
 # fastlane
 # It is recommended to not store the screenshots in the git repo.
@@ -128,15 +125,12 @@ fastlane/test_output
 iOSInjectionProject/
 
 ### Xcode config file ###
-*.xcconfig
-.build/*
+Secrets.xcconfig
 
 
 # End of https://www.toptal.com/developers/gitignore/api/xcode,macos,swift,swiftpackagemanager,cocoapods
-temp_auto_push.bat
-temp_interactive_push.bat
-branch_structure.json
 
 # Claude Code
 CLAUDE.local.md
 .claude/*.lock
+.claude/settings.local.json
