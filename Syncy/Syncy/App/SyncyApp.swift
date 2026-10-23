@@ -17,7 +17,7 @@ struct SyncyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppView(store: Self.store)
         }
     }
 }
