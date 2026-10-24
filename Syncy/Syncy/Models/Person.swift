@@ -8,7 +8,7 @@
 import ComposableArchitecture
 import Foundation
 
-struct Person: Equatable{
+struct Person: Equatable, Codable {
     var id: UUID
     var name: String
     var part: SessionID

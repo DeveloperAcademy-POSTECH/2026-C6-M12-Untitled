@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Patch: Equatable, Identifiable {
+struct Patch: Equatable, Identifiable, Codable {
     var id: UUID
     var sessionId: SessionID
     var startTime: TimeInterval
