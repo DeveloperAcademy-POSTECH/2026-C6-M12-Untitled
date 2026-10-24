@@ -68,8 +68,7 @@ struct SessionFeature{
                 state.phase = .uploading
                 return .run { send in
                     do {
-                        let data = try Data(contentsOf: fileURL)
-                        let jobID = try await separationClient.upload(data, serverURL)
+                        let jobID = try await separationClient.upload(fileURL, serverURL)
                         await send(.uploadSuccessResponse(jobID: jobID))
                     } catch {
                         await send(.uploadFailureResponse(reason: "업로드 실패"))
@@ -110,14 +109,14 @@ struct SessionFeature{
                 
             case .separationSuccessResponse:
                 state.phase = .downloading
-                guard let jobID = state.separationJobID else { return .none }
+                guard let jobID = state.separationJobID, let serverURL = state.serverURL else { return .none }
                 return .run { send in
                     do {
-                        let stems: [SessionID] = [.vocal, .drums, .bass, .guitar, .piano]
+                        let stems: [SessionID] = [.vocals, .drums, .bass, .guitar, .piano]
                         var tracks: [SongTrack] = []
                         for stem in stems {
-                            let data = try await separationClient.downloadStem(jobID, stem)
-                            let fileURL = try await songCacheClient.store(data, jobID, stem)
+                            let tempFile = try await separationClient.downloadStem(jobID, stem, serverURL)
+                            let fileURL = try await songCacheClient.store(tempFile, jobID, stem)
                             tracks.append(SongTrack(id: stem, fileURL: fileURL))
                         }
                         await send(.downloadSuccessResponse(tracks: tracks))

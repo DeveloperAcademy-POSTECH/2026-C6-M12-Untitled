@@ -10,17 +10,16 @@ import Foundation
 
 @DependencyClient
 struct SongCacheClient {
-    var store: (_ tempFile: Data, _ jobID: String, _ stem: SessionID) async throws -> URL
+    var store: (_ tempFile: URL, _ jobID: String, _ stem: SessionID) async throws -> URL
 }
 
 // Conform to DependencyKey to provide a live implementation of
 // the interface.
 extension SongCacheClient: DependencyKey{
     static let liveValue = Self(
-        store: { data, jobID, stem in
-            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("\(jobID)_\(stem.rawValue).mp3")
-            try? data.write(to: tempURL)
-            return tempURL
+        store: { tempFile, _, _ in
+            // 아직 가짜: 받은 임시 파일을 그대로 돌려준다. 영구 위치로 옮기는 건 SongCacheService에서.
+            tempFile
         },
     )
 }
