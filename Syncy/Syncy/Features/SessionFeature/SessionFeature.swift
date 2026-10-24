@@ -19,7 +19,7 @@ struct SessionFeature{
         var tracks: [SongTrack] = []
         var songBPM : Double = 120
         var firstBeatOffset: TimeInterval = 0
-        var serverURL: URL?
+        var serverURL: URL? = ServerConfig.separationBaseURL
         var serverStatus: ServerStatus = .searching
         var sharedSongJobID: String?
         var cachedSongJobID: String?
@@ -27,7 +27,8 @@ struct SessionFeature{
     
     @Dependency(\.separationClient) var separationClient
     @Dependency(\.songCacheClient) var songCacheClient
-    
+    @Dependency(\.continuousClock) var clock
+
     enum Action: Equatable{
         case fileSelected(fileURL: URL)
         case songInfoEntered(bpm: Double, firstBeat: TimeInterval)
@@ -71,7 +72,7 @@ struct SessionFeature{
                         let jobID = try await separationClient.upload(fileURL, serverURL)
                         await send(.uploadSuccessResponse(jobID: jobID))
                     } catch {
-                        await send(.uploadFailureResponse(reason: "업로드 실패"))
+                        await send(.uploadFailureResponse(reason: error.localizedDescription))
                     }
                 }
                 
@@ -84,7 +85,7 @@ struct SessionFeature{
                         let status = try await separationClient.status(jobID, serverURL)
                         await send(.statusPolled(status))
                     } catch {
-                        await send(.separationFailureResponse(reason: "업로드 실패"))
+                        await send(.separationFailureResponse(reason: error.localizedDescription))
                     }
                 }
                 
@@ -97,9 +98,13 @@ struct SessionFeature{
                 case .queued, .processing:
                     guard let jobID = state.separationJobID, let serverURL = state.serverURL else { return .none }
                     return .run { send in
-                        try await Task.sleep(for: .seconds(1))
-                        let nextStatus = try await separationClient.status(jobID, serverURL)
-                        await send(.statusPolled(nextStatus))
+                        do {
+                            try await clock.sleep(for: ServerConfig.statusPollInterval)
+                            let nextStatus = try await separationClient.status(jobID, serverURL)
+                            await send(.statusPolled(nextStatus))
+                        } catch {
+                            await send(.separationFailureResponse(reason: error.localizedDescription))
+                        }
                     }
                 case .done:
                     return .send(.separationSuccessResponse)
