@@ -1,0 +1,8 @@
+demucs==4.0.1
+fastapi==0.128.8
+uvicorn==0.39.0
+python-multipart==0.0.20
+lameenc==1.8.1
+soundfile==0.13.1
+torch==2.8.0
+torchaudio==2.8.0
