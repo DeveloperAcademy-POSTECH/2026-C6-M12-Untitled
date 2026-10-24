@@ -6,5 +6,5 @@
 //
 
 enum SessionID: String{
-    case vocal, drums, bass, guitar, piano
+    case vocals, drums, bass, guitar, piano
 }
