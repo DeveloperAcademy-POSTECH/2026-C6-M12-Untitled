@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Patch: Equatable, Identifiable {
+nonisolated struct Patch: Equatable, Identifiable {
     var id: UUID
     var sessionId: SessionID
     var startTime: TimeInterval
