@@ -190,10 +190,17 @@ struct FeedbackFeature {
                     do {
                         let data = try Data(contentsOf: fileURL)
                         let patchID = uuid()
-                        _ = try await storageClient.savePatchFile(data, patchID, songID)
-                        // Patch를 어떻게 만드는지 구현되면 작성. 위에서 받은 URL 사용
-                        // let patch = Patch(~~)
-                        // await send(.recordingSavedSuccessResponse(target: target, fileURL: fileURL, patch: patch))
+                        let savedURL = try await storageClient.savePatchFile(data, patchID, songID)
+                        let patch = Patch(
+                            id: patchID,
+                            sessionId: target.sessionID,
+                            startTime: target.range.lowerBound,
+                            endTime: target.range.upperBound,
+                            createdAt: date.now,
+                            sourceStart: 0,   // 미정: sourceStart의 의미가 정해지면 확정
+                            isAdopted: false
+                        )
+                        await send(.recordingSavedSuccessResponse(target: target, fileURL: savedURL, patch: patch))
                     } catch {
                         await send(.recordingSavedFailureResponse(reason: "녹음 저장 실패"))
                     }
