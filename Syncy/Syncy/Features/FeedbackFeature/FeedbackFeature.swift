@@ -24,6 +24,8 @@ struct FeedbackFeature {
     }
     
     @Dependency(\.storageClient) var storageClient
+    @Dependency(\.uuid) var uuid
+    @Dependency(\.date) var date
     
     enum Action: Equatable {
         case songOpened(songID: String)
@@ -83,10 +85,10 @@ struct FeedbackFeature {
                 guard let draft = state.pinDraft, let songID = state.songID else { return .none }
                 // canConfirm 조건은 의미 미정, PinDraft 구현되면 확정
                 let item = FeedbackItem(
-                    id: UUID(),
+                    id: uuid(),
                     startTime: draft.startTime,
                     endTime: draft.endTime,
-                    createdAt: Date(),
+                    createdAt: date.now,
                     text: text,
                     author: state.me,
                     translations: nil,
@@ -133,7 +135,7 @@ struct FeedbackFeature {
                 return .run { send in
                     do {
                         let data = try Data(contentsOf: fileURL)
-                        let patchID = UUID()
+                        let patchID = uuid()
                         _ = try await storageClient.savePatchFile(data, patchID, songID)
                         // Patch를 어떻게 만드는지 구현되면 작성. 위에서 받은 URL 사용
                         // let patch = Patch(~~)
@@ -147,11 +149,11 @@ struct FeedbackFeature {
                 guard let songID = state.songID else { return .none }
                 state.$patches.withLock { $0.append(patch) }
                 let attempt = FeedbackAttempt(
-                    id: UUID(),
+                    id: uuid(),
                     author: state.me,
                     sessionId: target.sessionID,
                     patchId: patch.id,
-                    createdAt: Date(),
+                    createdAt: date.now,
                     comments: []
                 )
                 state.pins[id: target.pinID]?.attempts.append(attempt)
