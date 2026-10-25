@@ -7,7 +7,5 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>같은 Wi-Fi에 있는 분리 서버에 연결해 곡을 파트별로 나눕니다.</string>
 </dict>
 </plist>

@@ -11,4 +11,6 @@ enum ServerConfig {
     static let separationBaseURL = URL(string: "http://127.0.0.1:8756")!
     /// 분리가 끝났는지 다시 확인하는 간격
     static let statusPollInterval: Duration = .seconds(1.5)
+    /// 서버에 바뀐 게 있는지 확인하는 간격 (동기화)
+    static let syncPollInterval: Duration = .seconds(3)
 }
