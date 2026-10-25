@@ -33,7 +33,7 @@ struct FeedbackFeature {
         case meChanged(Person)
         case createPinTapped(text: String)
         case pinDraftCancelled
-        case pinDeleted                // 작성자만, 인자 미정
+        case pinDeleted(id: FeedbackItem.ID)   // 작성자만
         case pinOpened(id: FeedbackItem.ID)
         case pinClosed
         case commentPosted             // 인자 미정
@@ -116,10 +116,21 @@ struct FeedbackFeature {
                 state.$pinDraft.withLock { $0 = nil }
                 return .none
                 
-            case .pinDeleted:
-                // 어떤 핀인지 미정
-                // canDelete(by: me) 확인 -> saveFeedback -> opProduced(.feedbackDeleted)
-                return .none
+            case let .pinDeleted(id):
+                guard let songID = state.songID,
+                      let pin = state.pins[id: id],
+                      pin.canDelete(by: state.me) else { return .none }
+                state.pins.remove(id: id)
+                if state.activePin?.pinID == id {
+                    state.$activePin.withLock { $0 = nil }
+                }
+                // 지운 핀에 달린 패치를 어떻게 할지 미정
+                return .merge(
+                    .run { [pins = Array(state.pins)] _ in
+                        try await storageClient.saveFeedback(songID, pins)
+                    },
+                    .send(.delegate(.opProduced(.feedbackDeleted(id: id))))
+                )
                 
             case let .pinOpened(id):
                 guard let pin = state.pins[id: id] else { return .none }
