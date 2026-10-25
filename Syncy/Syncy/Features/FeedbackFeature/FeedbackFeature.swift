@@ -29,6 +29,7 @@ struct FeedbackFeature {
     enum Action: Equatable {
         case songOpened(songID: String)
         case pinsLoaded(songID: String, pins: [FeedbackItem], patches: [Patch])
+        case pinsLoadFailureResponse(reason: String)
         case meChanged(Person)
         case createPinTapped(text: String)
         case pinDraftCancelled
@@ -62,11 +63,14 @@ struct FeedbackFeature {
                 state.appliedServerVersion = nil
                 state.$pinDraft.withLock { $0 = nil }
                 state.$activePin.withLock { $0 = nil }
-                // 불러오기 실패 처리는 아직 미정
                 return .run { send in
-                    let pins = try await storageClient.loadFeedback(songID)
-                    let patches = try await storageClient.loadPatches(songID)
-                    await send(.pinsLoaded(songID: songID, pins: pins, patches: patches))
+                    do {
+                        let pins = try await storageClient.loadFeedback(songID)
+                        let patches = try await storageClient.loadPatches(songID)
+                        await send(.pinsLoaded(songID: songID, pins: pins, patches: patches))
+                    } catch {
+                        await send(.pinsLoadFailureResponse(reason: error.localizedDescription))
+                    }
                 }
                 
             case let .pinsLoaded(songID, pins, patches):
@@ -76,6 +80,10 @@ struct FeedbackFeature {
                 state.$patches.withLock { $0 = IdentifiedArray(uniqueElements: patches) }
                 return .none
                 
+            case .pinsLoadFailureResponse:
+                // 실패 처리 미정 (alert 등?)
+                return .none
+
             case let .meChanged(person):
                 state.me = person
                 return .none
