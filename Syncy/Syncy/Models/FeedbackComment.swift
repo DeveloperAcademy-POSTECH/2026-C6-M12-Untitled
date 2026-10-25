@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FeedbackComment: Equatable {
+struct FeedbackComment: Equatable, Codable {
     var id: UUID
     var author: Person
     var text: String
