@@ -33,13 +33,13 @@ extension StorageClient: DependencyKey {
                 try await service.loadPatches(songID: songID)
             },
             savePatches: { songID, patches in
-                try await service.savePatches(songID: songID, patches)
+                try await service.savePatches(songID: songID, patches: patches)
             },
             savePatchFile: { tempFile, patchID, songID in
-                try await service.savePatchFile(tempFile: tempFile, patchID: patchID, songID)
+                try await service.savePatchFile(tempFile: tempFile, patchID: patchID, songID: songID)
             },
             patchFileURL: { patchID, songID in
-                service.patchFileURL(patchID: patchID, songID)
+                service.patchFileURL(patchID: patchID, songID: songID)
             }
         )
     }()

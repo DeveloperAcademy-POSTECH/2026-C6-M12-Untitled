@@ -15,10 +15,9 @@ struct FeedbackFeature {
         var me: Person
         var songID: String?
         var pins: IdentifiedArrayOf<FeedbackItem> = []
-        // @Shared 키는 SharedKeys 구현되면 확정
-        @Shared var pinDraft: PinDraft?
-        @Shared var activePin: ActivePin?
-        @Shared var patches: IdentifiedArrayOf<Patch>
+        @Shared(.pinDraft) var pinDraft: PinDraft?
+        @Shared(.activePin) var activePin: ActivePin?
+        @Shared(.patches) var patches: IdentifiedArrayOf<Patch>
         var appliedServerVersion: Int?  // 서버 것을 받았는지
         // @Presents var alertt: AlertState? -> 액션/타입 미정이라 일단 이렇게
     }
@@ -82,12 +81,12 @@ struct FeedbackFeature {
                 return .none
                 
             case let .createPinTapped(text):
-                guard let draft = state.pinDraft, let songID = state.songID else { return .none }
-                // canConfirm 조건은 의미 미정, PinDraft 구현되면 확정
+                guard let draft = state.pinDraft, draft.canConfirm, let range = draft.range,
+                      let songID = state.songID else { return .none }
                 let item = FeedbackItem(
                     id: uuid(),
-                    startTime: draft.startTime,
-                    endTime: draft.endTime,
+                    startTime: range.lowerBound,
+                    endTime: range.upperBound,
                     createdAt: date.now,
                     text: text,
                     author: state.me,
