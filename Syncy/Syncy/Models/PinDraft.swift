@@ -2,7 +2,7 @@
 //  PinDraft.swift
 //  Syncy
 //
-//  Created by martin on 10/22/26.
+//  Created by anna on 10/22/26.
 //
 
 import Foundation

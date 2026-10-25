@@ -2,7 +2,7 @@
 //  ActivePin.swift
 //  Syncy
 //
-//  Created by martin on 10/22/26.
+//  Created by anna on 10/22/26.
 //
 
 import Foundation
@@ -10,5 +10,5 @@ import Foundation
 struct ActivePin: Equatable {
     var pinID: UUID
     var range: ClosedRange<TimeInterval>
-    var sessionIDs: [SessionID]
+    var sessionID: SessionID
 }
