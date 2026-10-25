@@ -7,7 +7,6 @@
 
 extension FeedbackFeature {
     enum FeedbackStatus: Equatable {
-        case idle
         case discussing // 이야기 중
         case applied    // 패치 등록됨 (파트별)
     }
