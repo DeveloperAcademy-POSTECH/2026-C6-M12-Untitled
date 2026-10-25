@@ -101,8 +101,7 @@ struct FeedbackFeature {
                     .run { [pins = Array(state.pins)] _ in
                         try await storageClient.saveFeedback(songID, pins)
                     },
-                    // .feedbackAdded 연관값 미정
-                    .send(.delegate(.opProduced(.feedbackAdded)))
+                    .send(.delegate(.opProduced(.feedbackAdded(item))))
                 )
                 
             case .pinDraftCancelled:
@@ -160,9 +159,8 @@ struct FeedbackFeature {
                     .run { [patches = Array(state.patches)] _ in
                         try await storageClient.savePatches(songID, patches)
                     },
-                    // 연관값 미정
-                    .send(.delegate(.opProduced(.attemptAdded))),
-                    .send(.delegate(.opProduced(.patchUpserted))),
+                    .send(.delegate(.opProduced(.attemptAdded(attempt, feedbackID: target.pinID)))),
+                    .send(.delegate(.opProduced(.patchUpserted(patch)))),
                     .send(.delegate(.audioSaved(patchID: patch.id, fileURL: fileURL)))
                 )
                 
@@ -174,11 +172,12 @@ struct FeedbackFeature {
                 // 받은 파트만 등록 가능 - 판정 방법 미정
                 guard let songID = state.songID else { return .none }
                 state.$patches.withLock { $0[id: patchID]?.isAdopted = true }
+                guard let patch = state.patches[id: patchID] else { return .none }
                 return .merge(
                     .run { [patches = Array(state.patches)] _ in
                         try await storageClient.savePatches(songID, patches)
                     },
-                    .send(.delegate(.opProduced(.patchUpserted)))   // 연관값 미정
+                    .send(.delegate(.opProduced(.patchUpserted(patch))))
                 )
                 
             case .patchUnregistered, .patchDeleted:

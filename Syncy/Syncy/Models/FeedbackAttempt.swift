@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FeedbackAttempt: Equatable {
+struct FeedbackAttempt: Equatable, Codable {
     var id: UUID
     var author: Person       // 누구나
     var sessionId: SessionID
