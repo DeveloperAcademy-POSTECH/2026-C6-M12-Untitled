@@ -43,6 +43,10 @@ extension StorageClient: DependencyKey {
             }
         )
     }()
+
+    // 목데이터 Service라서 previewValue는 liveValue와 같음. 진짜 저장이 구현되면 분리
+    static let previewValue = liveValue
+    static let testValue = Self()
 }
 
 extension DependencyValues {
