@@ -42,8 +42,8 @@ struct FeedbackFeature {
         case recordingSavedSuccessResponse(target: RecordingTarget, fileURL: URL, patch: Patch)
         case recordingSavedFailureResponse(reason: String)
         case patchRegistered(patchID: UUID)
-        case patchUnregistered         // 인자 미정
-        case patchDeleted              // 인자 미정
+        case patchUnregistered(patchID: UUID)
+        case patchDeleted(patchID: UUID)   // 지울 수 있는 사람 미정
         case remoteReplaced(feedback: [FeedbackItem], patches: [Patch], version: Int)   // RemoteState 구현되면 타입 확정
 
         case delegate(Delegate)
@@ -236,9 +236,28 @@ struct FeedbackFeature {
                     .send(.delegate(.opProduced(.patchUpserted(patch))))
                 )
                 
-            case .patchUnregistered, .patchDeleted:
-                // 어떤 패치인지 인자 미정
-                return .none
+            case let .patchUnregistered(patchID):
+                guard let songID = state.songID else { return .none }
+                state.$patches.withLock { $0[id: patchID]?.isAdopted = false }
+                guard let patch = state.patches[id: patchID] else { return .none }
+                return .merge(
+                    .run { [patches = Array(state.patches)] _ in
+                        try await storageClient.savePatches(songID, patches)
+                    },
+                    .send(.delegate(.opProduced(.patchUpserted(patch))))
+                )
+
+            case let .patchDeleted(patchID):
+                // 누가 지울 수 있는지 미정
+                guard let songID = state.songID, state.patches[id: patchID] != nil else { return .none }
+                state.$patches.withLock { $0.remove(id: patchID) }
+                // 저장된 녹음 파일 삭제는 StorageClient에 함수가 없어 미정
+                return .merge(
+                    .run { [patches = Array(state.patches)] _ in
+                        try await storageClient.savePatches(songID, patches)
+                    },
+                    .send(.delegate(.opProduced(.patchDeleted(id: patchID))))
+                )
                 
             case let .remoteReplaced(feedback, patches, version):
                 state.pins = IdentifiedArray(uniqueElements: feedback)
