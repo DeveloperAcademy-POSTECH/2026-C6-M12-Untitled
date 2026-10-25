@@ -8,7 +8,7 @@
 import ComposableArchitecture
 import Foundation
 
-struct FeedbackItem: Equatable, Identifiable {
+struct FeedbackItem: Equatable, Identifiable, Codable {
     var id: UUID
     var startTime: TimeInterval
     var endTime: TimeInterval

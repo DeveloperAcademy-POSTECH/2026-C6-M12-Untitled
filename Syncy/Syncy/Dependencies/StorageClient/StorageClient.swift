@@ -15,7 +15,7 @@ struct StorageClient {
     var loadPatches: (_ songID: String) async throws -> [Patch]
     var savePatches: (_ songID: String, _ patches: [Patch]) async throws -> Void
     var savePatchFile: (_ tempFile: Data, _ patchID: UUID, _ songID: String) async throws -> URL
-    var patchFileURL: (_ patchID: UUID, _ songID: String) -> URL
+    var patchFileURL: (_ patchID: UUID, _ songID: String) -> URL = { _, _ in FileManager.default.temporaryDirectory }
 }
 
 // liveValue는 Service에 일을 넘기기만.
