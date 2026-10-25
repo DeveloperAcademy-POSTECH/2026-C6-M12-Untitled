@@ -36,8 +36,8 @@ struct FeedbackFeature {
         case pinDeleted(id: FeedbackItem.ID)   // 작성자만
         case pinOpened(id: FeedbackItem.ID)
         case pinClosed
-        case commentPosted             // 인자 미정
-        case commentDeleted            // 인자 미정
+        case commentPosted(feedbackID: UUID, attemptID: UUID?, text: String)   // attemptID 없으면 핀, 있으면 그 녹음 답
+        case commentDeleted(commentID: UUID, feedbackID: UUID, attemptID: UUID?)   // 작성자만
         case recordingFinished(target: RecordingTarget, fileURL: URL)
         case recordingSavedSuccessResponse(target: RecordingTarget, fileURL: URL, patch: Patch)
         case recordingSavedFailureResponse(reason: String)
@@ -143,9 +143,46 @@ struct FeedbackFeature {
                 state.$activePin.withLock { $0 = nil }
                 return .none
                 
-            case .commentPosted, .commentDeleted:
-                // 핀에 다는지 녹음 답에 다는지 미정
-                return .none
+            case let .commentPosted(feedbackID, attemptID, text):
+                guard let songID = state.songID, state.pins[id: feedbackID] != nil else { return .none }
+                let comment = FeedbackComment(
+                    id: uuid(),
+                    author: state.me,
+                    text: text,
+                    createdAt: date.now,
+                    translations: nil   // 번역은 아직 미정
+                )
+                if let attemptID {
+                    guard let index = state.pins[id: feedbackID]?.attempts.firstIndex(where: { $0.id == attemptID }) else { return .none }
+                    state.pins[id: feedbackID]?.attempts[index].comments.append(comment)
+                } else {
+                    state.pins[id: feedbackID]?.comments.append(comment)
+                }
+                return .merge(
+                    .run { [pins = Array(state.pins)] _ in
+                        try await storageClient.saveFeedback(songID, pins)
+                    },
+                    .send(.delegate(.opProduced(.commentAdded(comment, feedbackID: feedbackID, attemptID: attemptID))))
+                )
+
+            case let .commentDeleted(commentID, feedbackID, attemptID):
+                guard let songID = state.songID, state.pins[id: feedbackID] != nil else { return .none }
+                if let attemptID {
+                    guard let index = state.pins[id: feedbackID]?.attempts.firstIndex(where: { $0.id == attemptID }),
+                          let comment = state.pins[id: feedbackID]?.attempts[index].comments.first(where: { $0.id == commentID }),
+                          comment.author.id == state.me.id else { return .none }
+                    state.pins[id: feedbackID]?.attempts[index].comments.removeAll { $0.id == commentID }
+                } else {
+                    guard let comment = state.pins[id: feedbackID]?.comments.first(where: { $0.id == commentID }),
+                          comment.author.id == state.me.id else { return .none }
+                    state.pins[id: feedbackID]?.comments.removeAll { $0.id == commentID }
+                }
+                return .merge(
+                    .run { [pins = Array(state.pins)] _ in
+                        try await storageClient.saveFeedback(songID, pins)
+                    },
+                    .send(.delegate(.opProduced(.commentDeleted(id: commentID, feedbackID: feedbackID, attemptID: attemptID))))
+                )
                 
             case let .recordingFinished(target, fileURL):
                 guard let songID = state.songID else { return .none }
