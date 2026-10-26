@@ -249,22 +249,25 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
 
     // MARK: - 녹음
 
+    func requestRecordingPermission() async throws {
+        try Task.checkCancellation()
+        guard let description = Bundle.main.object(forInfoDictionaryKey: "NSMicrophoneUsageDescription") as? String,
+              !description.isEmpty else { throw AudioServiceError.missingMicrophoneDescription }
+        let permitted = await AVAudioApplication.requestRecordPermission()
+        try Task.checkCancellation()
+        guard permitted else { throw AudioServiceError.microphoneDenied }
+    }
+
     func startRecording(_ trackID: SessionID, range: ClosedRange<TimeInterval>) async throws {
         try Task.checkCancellation()
         guard tracks[trackID] != nil else { throw AudioServiceError.noTracks }
         guard validRange(range) else { throw AudioServiceError.invalidRange }
         guard recording == nil, pendingRecordingID == nil else { throw AudioServiceError.alreadyRecording }
-        guard let description = Bundle.main.object(forInfoDictionaryKey: "NSMicrophoneUsageDescription") as? String,
-              !description.isEmpty else { throw AudioServiceError.missingMicrophoneDescription }
-
         let requestID = UUID()
         pendingRecordingID = requestID
         defer { if pendingRecordingID == requestID { pendingRecordingID = nil } }
-        let permitted = await AVAudioApplication.requestRecordPermission()
-        // 권한 창을 기다리는 동안의 취소·곡 변경도 확인한다.
-        try Task.checkCancellation()
+        try await requestRecordingPermission()
         guard pendingRecordingID == requestID else { throw CancellationError() }
-        guard permitted else { throw AudioServiceError.microphoneDenied }
         try configureSession()
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("recording-\(UUID().uuidString).m4a")

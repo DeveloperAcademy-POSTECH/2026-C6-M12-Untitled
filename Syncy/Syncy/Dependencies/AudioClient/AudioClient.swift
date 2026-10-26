@@ -21,6 +21,7 @@ struct AudioClient {
     var setSolo: (_ trackID: SessionID?) async -> Void
     var activatePatch: (_ patch: Patch, _ file: URL) async -> Bool = { _, _ in false }
     var deactivatePatch: (_ patchID: UUID, _ trackID: SessionID) async -> Void
+    var requestRecordingPermission: () async throws -> Void
     var startRecording: (_ trackID: SessionID, _ range: ClosedRange<TimeInterval>) async throws -> Void
     var stopRecording: () async throws -> URL
     var cancelRecording: () async -> Void
@@ -54,6 +55,7 @@ extension AudioClient: DependencyKey {
             setSolo: { service.setSolo($0) },
             activatePatch: { service.activatePatch($0, file: $1) },
             deactivatePatch: { service.deactivatePatch($0, trackID: $1) },
+            requestRecordingPermission: { try await service.requestRecordingPermission() },
             startRecording: { try await service.startRecording($0, range: $1) },
             stopRecording: { try service.stopRecording() },
             cancelRecording: { service.cancelRecording() },

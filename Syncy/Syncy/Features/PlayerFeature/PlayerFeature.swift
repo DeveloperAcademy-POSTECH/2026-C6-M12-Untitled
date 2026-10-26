@@ -62,6 +62,7 @@ struct PlayerFeature {
         case recordTapped
         case recordCancelTapped
         case audioEvent(AudioEvent)
+        case recordingPermissionResponse
         case countInTicked
         case countInFinished
         case recordingRangeEnded
@@ -144,13 +145,6 @@ struct PlayerFeature {
                         let duration = try await audioClient.load(tracks)
                         try Task.checkCancellation()
                         
-                        await audioClient.setLoop(nil)
-                        try Task.checkCancellation()
-                        await audioClient.setSolo(nil)
-                        try Task.checkCancellation()
-                        await audioClient.setRate(1.0)
-                        try Task.checkCancellation()
-                        
                         await send(.loadResponse(duration: duration))
                     } catch is CancellationError {
                         return
@@ -186,17 +180,7 @@ struct PlayerFeature {
                 guard state.loadPhase == .loading else { return .none }
                 state.loadPhase = .failed(reason: reason)
                 
-                state.destination = .alert(
-                    AlertState {
-                        TextState("곡을 불러오지 못했어요.")
-                    } actions: {
-                        ButtonState(role: .cancel) {
-                            TextState("확인")
-                        }
-                    } message: {
-                        TextState(reason)
-                    }
-                )
+                state.destination = Self.alert("곡을 불러오지 못했어요.", reason: reason)
                 return .none
                 
             case .playPauseTapped:
@@ -253,17 +237,7 @@ struct PlayerFeature {
                 state.isChangingPlayback = false
                 state.isPlaying = false
                 
-                state.destination = .alert(
-                    AlertState {
-                        TextState("재생을 시작하지 못했어요.")
-                    } actions: {
-                        ButtonState(role: .cancel) {
-                            TextState("확인")
-                        }
-                    } message: {
-                        TextState(reason)
-                    }
-                )
+                state.destination = Self.alert("재생을 시작하지 못했어요.", reason: reason)
                 return .none
                 
             case let .seekChanged(time):
@@ -390,26 +364,43 @@ struct PlayerFeature {
                 state.recordingTarget = RecordingTarget(
                     pinID: pin.pinID, range: pin.range, sessionID: pin.sessionID
                 )
-                state.recordingPhase = .countIn(beat: 0)
+                state.recordingPhase = .requestingPermission
                 state.isPlaying = false
                 
                 return .concatenate(
                     .cancel(id: CancelID.playback),
                     .cancel(id: CancelID.controls),
                     .run { [audioClient, clock, bpm = beatGrid.bpm] send in
-                        await audioClient.pause()
-                        try Task.checkCancellation()
-                        for beat in 1...4 {
-                            await audioClient.click(beat == 1)
+                        do {
+                            await audioClient.pause()
                             try Task.checkCancellation()
-                            await send(.countInTicked)
-                            try await clock.sleep(for: .seconds(60 / bpm))
+                            try await audioClient.requestRecordingPermission()
+                            try Task.checkCancellation()
+                            await send(.recordingPermissionResponse)
+                            try Task.checkCancellation()
+                            for beat in 1...4 {
+                                await audioClient.click(beat == 1)
+                                try Task.checkCancellation()
+                                await send(.countInTicked)
+                                try await clock.sleep(for: .seconds(60 / bpm))
+                            }
+                            await send(.countInFinished)
+                        } catch is CancellationError {
+                            return
+                        } catch {
+                            guard !Task.isCancelled else { return }
+                            await send(.recordingFailureResponse(reason: error.localizedDescription))
                         }
-                        await send(.countInFinished)
                     }
                         .cancellable(id: CancelID.countIn, cancelInFlight: true)
                 )
                 
+            case .recordingPermissionResponse:
+                guard state.recordingPhase == .requestingPermission,
+                      state.recordingTarget != nil else { return .none }
+                state.recordingPhase = .countIn(beat: 0)
+                return .none
+
             case .countInTicked:
                 guard case let .countIn(beat) = state.recordingPhase,
                       beat < 4 else { return .none }
@@ -422,18 +413,9 @@ struct PlayerFeature {
                 
                 return .run { [audioClient] send in
                     do {
-                        await audioClient.setLoop(nil)
-                        try Task.checkCancellation()
-                        await audioClient.setSolo(nil)
-                        try Task.checkCancellation()
-                        await audioClient.setRate(1)
-                        try Task.checkCancellation()
-                        await audioClient.seek(target.range.lowerBound)
-                        try Task.checkCancellation()
                         try await audioClient.startRecording(target.sessionID, target.range)
                         try Task.checkCancellation()
                         let positions = await audioClient.position()
-                        try await audioClient.play()
                         try Task.checkCancellation()
                         await send(.recordingStartedResponse)
                         for await position in positions {
@@ -465,13 +447,9 @@ struct PlayerFeature {
                 guard state.recordingPhase == .recording else { return .none }
                 state.recordingPhase = .finishing
                 state.isPlaying = false
-                return .run { [audioClient, state] send in
+                return .run { [audioClient] send in
                     do {
-                        await audioClient.pause()
-                        try Task.checkCancellation()
                         let fileURL = try await audioClient.stopRecording()
-                        try Task.checkCancellation()
-                        await restorePlayback(state)
                         try Task.checkCancellation()
                         await send(.recordingResponse(fileURL: fileURL))
                     } catch is CancellationError {
@@ -544,7 +522,7 @@ struct PlayerFeature {
                       var track = state.tracks[id: trackID] else { return .none }
                 let patchIDs = track.activePatchIDs.filter { id in
                     guard let patch = state.patches[id: id] else { return true }
-                    return patch.timeRange.overlaps(range)
+                    return patch.startTime < range.upperBound && range.lowerBound < patch.endTime
                 }
                 track.activePatchIDs.subtract(patchIDs)
                 state.tracks[id: trackID] = track
@@ -597,35 +575,19 @@ struct PlayerFeature {
         state.isPlaying = false
         state.isChangingPlayback = false
         state.recordingPhase = .finishing
-        let snapshot = state
         state.recordingTarget = nil
         return .concatenate(
             .cancel(id: CancelID.countIn),
             .cancel(id: CancelID.recording),
             .cancel(id: CancelID.playback),
-            .run { [audioClient, snapshot] send in
+            .run { [audioClient] send in
                 await audioClient.cancelRecording()
                 try Task.checkCancellation()
                 await audioClient.pause()
-                try Task.checkCancellation()
-                await restorePlayback(snapshot)
                 try Task.checkCancellation()
                 await send(.recordingCancelledResponse)
             }
                 .cancellable(id: CancelID.recording)
         )
-    }
-    
-    private func restorePlayback(_ state: State) async {
-        guard !Task.isCancelled else { return }
-        await audioClient.setRate(state.playbackRate)
-        guard !Task.isCancelled else { return }
-        await audioClient.setLoop(state.loopRange)
-        guard !Task.isCancelled else { return }
-        await audioClient.setSolo(state.soloTrackID)
-        if let target = state.recordingTarget,
-           let track = state.tracks[id: target.sessionID], !Task.isCancelled {
-            await audioClient.setMuted(target.sessionID, track.isMuted)
-        }
     }
 }

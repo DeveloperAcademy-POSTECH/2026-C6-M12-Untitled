@@ -7,6 +7,7 @@
 
 enum RecordingPhase: Equatable {
     case idle
+    case requestingPermission
     case countIn(beat: Int)
     case recording
     case finishing
