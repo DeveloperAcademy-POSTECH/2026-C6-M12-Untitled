@@ -29,20 +29,21 @@ struct FeedbackFeature {
     enum Action: Equatable {
         case songOpened(songID: String)
         case pinsLoaded(songID: String, pins: [FeedbackItem], patches: [Patch])
+        case pinsLoadFailureResponse(reason: String)
         case meChanged(Person)
         case createPinTapped(text: String)
         case pinDraftCancelled
-        case pinDeleted                // 작성자만, 인자 미정
+        case pinDeleted(id: FeedbackItem.ID)   // 작성자만
         case pinOpened(id: FeedbackItem.ID)
         case pinClosed
-        case commentPosted             // 인자 미정
-        case commentDeleted            // 인자 미정
+        case commentPosted(feedbackID: UUID, attemptID: UUID?, text: String)   // attemptID 없으면 핀, 있으면 그 녹음 답
+        case commentDeleted(commentID: UUID, feedbackID: UUID, attemptID: UUID?)   // 작성자만
         case recordingFinished(target: RecordingTarget, fileURL: URL)
         case recordingSavedSuccessResponse(target: RecordingTarget, fileURL: URL, patch: Patch)
         case recordingSavedFailureResponse(reason: String)
         case patchRegistered(patchID: UUID)
-        case patchUnregistered         // 인자 미정
-        case patchDeleted              // 인자 미정
+        case patchUnregistered(patchID: UUID)
+        case patchDeleted(patchID: UUID)   // 지울 수 있는 사람 미정
         case remoteReplaced(feedback: [FeedbackItem], patches: [Patch], version: Int)   // RemoteState 구현되면 타입 확정
 
         case delegate(Delegate)
@@ -62,11 +63,14 @@ struct FeedbackFeature {
                 state.appliedServerVersion = nil
                 state.$pinDraft.withLock { $0 = nil }
                 state.$activePin.withLock { $0 = nil }
-                // 불러오기 실패 처리는 아직 미정
                 return .run { send in
-                    let pins = try await storageClient.loadFeedback(songID)
-                    let patches = try await storageClient.loadPatches(songID)
-                    await send(.pinsLoaded(songID: songID, pins: pins, patches: patches))
+                    do {
+                        let pins = try await storageClient.loadFeedback(songID)
+                        let patches = try await storageClient.loadPatches(songID)
+                        await send(.pinsLoaded(songID: songID, pins: pins, patches: patches))
+                    } catch {
+                        await send(.pinsLoadFailureResponse(reason: error.localizedDescription))
+                    }
                 }
                 
             case let .pinsLoaded(songID, pins, patches):
@@ -76,6 +80,10 @@ struct FeedbackFeature {
                 state.$patches.withLock { $0 = IdentifiedArray(uniqueElements: patches) }
                 return .none
                 
+            case .pinsLoadFailureResponse:
+                // 실패 처리 미정 (alert 등?)
+                return .none
+
             case let .meChanged(person):
                 state.me = person
                 return .none
@@ -108,10 +116,21 @@ struct FeedbackFeature {
                 state.$pinDraft.withLock { $0 = nil }
                 return .none
                 
-            case .pinDeleted:
-                // 어떤 핀인지 미정
-                // canDelete(by: me) 확인 -> saveFeedback -> opProduced(.feedbackDeleted)
-                return .none
+            case let .pinDeleted(id):
+                guard let songID = state.songID,
+                      let pin = state.pins[id: id],
+                      pin.canDelete(by: state.me) else { return .none }
+                state.pins.remove(id: id)
+                if state.activePin?.pinID == id {
+                    state.$activePin.withLock { $0 = nil }
+                }
+                // 지운 핀에 달린 패치를 어떻게 할지 미정
+                return .merge(
+                    .run { [pins = Array(state.pins)] _ in
+                        try await storageClient.saveFeedback(songID, pins)
+                    },
+                    .send(.delegate(.opProduced(.feedbackDeleted(id: id))))
+                )
                 
             case let .pinOpened(id):
                 guard let pin = state.pins[id: id] else { return .none }
@@ -124,9 +143,46 @@ struct FeedbackFeature {
                 state.$activePin.withLock { $0 = nil }
                 return .none
                 
-            case .commentPosted, .commentDeleted:
-                // 핀에 다는지 녹음 답에 다는지 미정
-                return .none
+            case let .commentPosted(feedbackID, attemptID, text):
+                guard let songID = state.songID, state.pins[id: feedbackID] != nil else { return .none }
+                let comment = FeedbackComment(
+                    id: uuid(),
+                    author: state.me,
+                    text: text,
+                    createdAt: date.now,
+                    translations: nil   // 번역은 아직 미정
+                )
+                if let attemptID {
+                    guard let index = state.pins[id: feedbackID]?.attempts.firstIndex(where: { $0.id == attemptID }) else { return .none }
+                    state.pins[id: feedbackID]?.attempts[index].comments.append(comment)
+                } else {
+                    state.pins[id: feedbackID]?.comments.append(comment)
+                }
+                return .merge(
+                    .run { [pins = Array(state.pins)] _ in
+                        try await storageClient.saveFeedback(songID, pins)
+                    },
+                    .send(.delegate(.opProduced(.commentAdded(comment, feedbackID: feedbackID, attemptID: attemptID))))
+                )
+
+            case let .commentDeleted(commentID, feedbackID, attemptID):
+                guard let songID = state.songID, state.pins[id: feedbackID] != nil else { return .none }
+                if let attemptID {
+                    guard let index = state.pins[id: feedbackID]?.attempts.firstIndex(where: { $0.id == attemptID }),
+                          let comment = state.pins[id: feedbackID]?.attempts[index].comments.first(where: { $0.id == commentID }),
+                          comment.author.id == state.me.id else { return .none }
+                    state.pins[id: feedbackID]?.attempts[index].comments.removeAll { $0.id == commentID }
+                } else {
+                    guard let comment = state.pins[id: feedbackID]?.comments.first(where: { $0.id == commentID }),
+                          comment.author.id == state.me.id else { return .none }
+                    state.pins[id: feedbackID]?.comments.removeAll { $0.id == commentID }
+                }
+                return .merge(
+                    .run { [pins = Array(state.pins)] _ in
+                        try await storageClient.saveFeedback(songID, pins)
+                    },
+                    .send(.delegate(.opProduced(.commentDeleted(id: commentID, feedbackID: feedbackID, attemptID: attemptID))))
+                )
                 
             case let .recordingFinished(target, fileURL):
                 guard let songID = state.songID else { return .none }
@@ -134,10 +190,17 @@ struct FeedbackFeature {
                     do {
                         let data = try Data(contentsOf: fileURL)
                         let patchID = uuid()
-                        _ = try await storageClient.savePatchFile(data, patchID, songID)
-                        // Patch를 어떻게 만드는지 구현되면 작성. 위에서 받은 URL 사용
-                        // let patch = Patch(~~)
-                        // await send(.recordingSavedSuccessResponse(target: target, fileURL: fileURL, patch: patch))
+                        let savedURL = try await storageClient.savePatchFile(data, patchID, songID)
+                        let patch = Patch(
+                            id: patchID,
+                            sessionId: target.sessionID,
+                            startTime: target.range.lowerBound,
+                            endTime: target.range.upperBound,
+                            createdAt: date.now,
+                            sourceStart: 0,   // 미정: sourceStart의 의미가 정해지면 확정
+                            isAdopted: false
+                        )
+                        await send(.recordingSavedSuccessResponse(target: target, fileURL: savedURL, patch: patch))
                     } catch {
                         await send(.recordingSavedFailureResponse(reason: "녹음 저장 실패"))
                     }
@@ -180,9 +243,28 @@ struct FeedbackFeature {
                     .send(.delegate(.opProduced(.patchUpserted(patch))))
                 )
                 
-            case .patchUnregistered, .patchDeleted:
-                // 어떤 패치인지 인자 미정
-                return .none
+            case let .patchUnregistered(patchID):
+                guard let songID = state.songID else { return .none }
+                state.$patches.withLock { $0[id: patchID]?.isAdopted = false }
+                guard let patch = state.patches[id: patchID] else { return .none }
+                return .merge(
+                    .run { [patches = Array(state.patches)] _ in
+                        try await storageClient.savePatches(songID, patches)
+                    },
+                    .send(.delegate(.opProduced(.patchUpserted(patch))))
+                )
+
+            case let .patchDeleted(patchID):
+                // 누가 지울 수 있는지 미정
+                guard let songID = state.songID, state.patches[id: patchID] != nil else { return .none }
+                state.$patches.withLock { $0.remove(id: patchID) }
+                // 저장된 녹음 파일 삭제는 StorageClient에 함수가 없어 미정
+                return .merge(
+                    .run { [patches = Array(state.patches)] _ in
+                        try await storageClient.savePatches(songID, patches)
+                    },
+                    .send(.delegate(.opProduced(.patchDeleted(id: patchID))))
+                )
                 
             case let .remoteReplaced(feedback, patches, version):
                 state.pins = IdentifiedArray(uniqueElements: feedback)
