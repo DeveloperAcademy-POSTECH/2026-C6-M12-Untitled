@@ -2,7 +2,7 @@
 //  PlayerIconButton.swift
 //  Syncy
 //
-//  Created by Taeeun on 10/27/26.
+//  Created by anna on 10/27/26.
 //
 
 import SwiftUI
