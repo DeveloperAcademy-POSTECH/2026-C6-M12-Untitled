@@ -7,6 +7,32 @@
 
 import SwiftUI
 
+struct PlaybackPositionView: View {
+    let position: MusicalPosition
+
+    var body: some View {
+        HStack(spacing: 0) {
+            Text(String(format: "%03d마디", position.measure))
+
+            Spacer(minLength: 0)
+
+            Rectangle()
+                .fill(Color("AlphaWhite15"))
+                .frame(width: 1, height: 20)
+
+            Spacer(minLength: 0)
+
+            Text(String(format: "%03d비트", position.beat))
+        }
+        .font(.system(size: 15, weight: .regular))
+        .foregroundStyle(Color("Gray100"))
+        .lineLimit(1)
+        .padding(.horizontal, 12)
+        .frame(width: 140, height: 34)
+        .background(Color("Surface3"), in: RoundedRectangle(cornerRadius: 8))
+    }
+}
+
 struct TrackRangeOverlay: View {
     enum Kind {
         case selection
