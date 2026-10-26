@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct TrackHeaderView: View {
-    
     let trackName: String
     let memberName: String
     var profileImage: Image? = nil

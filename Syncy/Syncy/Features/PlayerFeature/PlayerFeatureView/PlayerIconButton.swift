@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct PlayerIconButton: View {
-    
     enum Kind {
         case record
         case play
