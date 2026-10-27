@@ -21,6 +21,17 @@ struct SongCacheService: Sendable {
         return destination
     }
 
+    // 2차에서 추가: 저장된 곡 전체 크기
+    func totalSize() async throws -> Int {
+        // 목데이터: 계산 방법 미정
+        return 0
+    }
+
+    // 2차에서 추가: 저장된 곡 전부 지움
+    func removeAll() async throws {
+        // 목데이터: 지우는 방법 미정
+    }
+
     private func songsFolder() throws -> URL {
         try FileManager.default
             .url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
