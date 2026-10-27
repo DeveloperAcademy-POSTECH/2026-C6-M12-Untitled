@@ -12,4 +12,5 @@ struct Person: Equatable, Codable {
     var id: UUID
     var name: String
     var part: SessionID
+    var photoURL: URL?   // 2차에서 추가
 }

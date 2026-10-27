@@ -24,3 +24,24 @@ extension SharedReaderKey where Self == InMemoryKey<IdentifiedArrayOf<Patch>>.De
         Self[.inMemory("patches"), default: []]
     }
 }
+
+// 쓰기: AppFeature · Settings, 읽기: Home · Feedback · Player
+extension SharedReaderKey where Self == InMemoryKey<Band?>.Default {
+    static var currentBand: Self {
+        Self[.inMemory("currentBand"), default: nil]
+    }
+}
+
+// 쓰기: Settings, 읽기: Player · Practice
+extension SharedReaderKey where Self == AppStorageKey<PracticeSettings>.Default {
+    static var practiceSettings: Self {
+        Self[.appStorage("practiceSettings"), default: PracticeSettings()]
+    }
+}
+
+// 쓰기: Tutorial, 읽기: AppFeature
+extension SharedReaderKey where Self == AppStorageKey<Bool>.Default {
+    static var tutorialDone: Self {
+        Self[.appStorage("tutorialDone"), default: false]
+    }
+}
