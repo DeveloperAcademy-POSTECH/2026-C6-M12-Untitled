@@ -16,6 +16,8 @@ struct PracticeFeature {
         var practiceRange: ClosedRange<TimeInterval>?
         var isLoopEnabled: Bool = false
         var tempo: Float = 1.0
+        var stage: PracticeStage = .idle       // 미정: 단계가 바뀌는 시점
+        var candidates: [FeedbackItem] = []    // 미정: 후보를 채우는 시점
         var isMetronomeEnabled: Bool = false   // 미정: 기본값
         var metronomeVolume: Int = 100         // 미정: 기본값 (0~100)
         var metronomeBPM: Double = 120         // 미정: 기본값 (0보다 큼). 곡이 열리면 곡 BPM으로 바뀜
@@ -38,10 +40,16 @@ struct PracticeFeature {
         case metronomeOffTapped
         case metronomeVolumeChanged(Int)
         case metronomeBPMChanged(Double)
+        case practiceRequested(FeedbackItem)
+        case practiceStartTapped
+        case candidateSelected(id: FeedbackItem.ID)
+        case onceMoreTapped
+        case recordTapped
         
         case delegate(Delegate)
         enum Delegate: Sendable {
             case playback(PracticeCommand)
+            case recordRequested
         }
     }
     
@@ -54,6 +62,8 @@ struct PracticeFeature {
                 state.practiceRange = nil
                 state.isLoopEnabled = false
                 state.tempo = 1.0
+                state.stage = .idle
+                state.candidates = []
                 // 메트로놈이 켜져 있던 경우 처리는 미정
                 return .none
                 
@@ -99,6 +109,27 @@ struct PracticeFeature {
                 // 0 이하 값 처리는 미정
                 state.metronomeBPM = bpm
                 return setMetronome(state: state)
+                
+            case .practiceRequested:
+                // 미정: Feedback이 보낸 핀으로 연습을 준비하는 동작 (구간 · 후보 · 단계)
+                return .none
+                
+            case .practiceStartTapped:
+                // 미정: 연습을 시작할 때의 단계 변화 (countIn → looping)
+                return .none
+                
+            case .candidateSelected:
+                // 미정: 후보를 골랐을 때의 동작
+                return .none
+                
+            case .onceMoreTapped:
+                // 미정: 한 번 더 연습할 때의 단계 변화
+                return .none
+                
+            case .recordTapped:
+                // 녹음은 Player가 한다. 부모에게 알리기만 한다 (연결 25)
+                // 미정: stage를 .recording으로 바꾸는 시점
+                return .send(.delegate(.recordRequested))
                 
             case .delegate:
                 return .none
