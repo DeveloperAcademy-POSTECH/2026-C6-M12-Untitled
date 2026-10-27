@@ -9,8 +9,9 @@ import SwiftUI
 
 struct TrackHeaderView: View {
     let trackName: String
-    let memberName: String
-    var profileImage: Image? = nil
+    // TODO: 멤버 데이터 연결 시 필수 이름과 선택적 프로필 이미지를 전달받는다.
+    // let memberName: String
+    // var profileImage: Image? = nil
     let isMuted: Bool
     let isSolo: Bool
     @Binding var volume: Float
@@ -21,7 +22,9 @@ struct TrackHeaderView: View {
         
         VStack(alignment: .leading, spacing: 6.5) {
             HStack(spacing: 10) {
-                TrackProfileView(name: memberName, image: profileImage)
+                // TrackProfileView(name: memberName, image: profileImage)
+                // 프로필 연결 전에도 트랙 이름의 배치 위치는 유지한다.
+                Color.clear.frame(width: 32, height: 32)
 
                 Text(trackName)
                     .font(.subheadline.weight(.bold))
@@ -46,7 +49,7 @@ struct TrackHeaderView: View {
         }
         .padding(.horizontal, 14)
         .padding(.top, 38)
-        .frame(width: 244, height: 178, alignment: .topLeading)
+        .frame(width: PlayerLayout.headerWidth, height: PlayerLayout.rowHeight, alignment: .topLeading)
     }
 }
 

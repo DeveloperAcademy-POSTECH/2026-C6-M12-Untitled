@@ -13,7 +13,10 @@ import ComposableArchitecture
 struct PlayerFeature {
     @ObservableState
     struct State: Equatable {
+        var songID: String?
         var tracks: IdentifiedArrayOf<TrackState> = []
+        var waveforms: [SessionID: WaveformPeaks] = [:]
+        var waveformErrors: [SessionID: String] = [:]
         var loadPhase: LoadPhase = .idle
         var isPlaying: Bool = false
         var playbackRate: Float = 1.0
@@ -38,14 +41,17 @@ struct PlayerFeature {
         case recording
         case controls
         case patches
+        case waveforms
     }
     
     @Dependency(\.audioClient) var audioClient
     @Dependency(\.continuousClock) var clock
+    @Dependency(\.waveformClient) var waveformClient
     
     enum Action: Sendable {
         case task
         case playPauseTapped
+        case loopTapped
         case seekChanged(time: TimeInterval)
         case volumeChanged(trackID: SessionID, volume: Float)
         case muteTapped(trackID: SessionID)
@@ -58,6 +64,8 @@ struct PlayerFeature {
         case songLoaded(Song)
         case loadResponse(duration: TimeInterval)
         case loadFailureResponse(reason: String)
+        case waveformResponse(songID: String, trackID: SessionID, peaks: WaveformPeaks)
+        case waveformFailureResponse(songID: String, trackID: SessionID, reason: String)
         case patchesChanged
         case recordTapped
         case recordCancelTapped
@@ -107,6 +115,9 @@ struct PlayerFeature {
                 )
                 
             case let .songLoaded(song):
+                state.songID = song.id
+                state.waveforms = [:]
+                state.waveformErrors = [:]
                 state.loadPhase = .loading
                 state.isPlaying = false
                 state.playbackRate = 1.0
@@ -159,13 +170,44 @@ struct PlayerFeature {
                     }
                 }
                     .cancellable(id: CancelID.load, cancelInFlight: true)
+
+                let waveformEffect: Effect<Action> = .run {
+                    [waveformClient, songID = song.id, tracks = song.tracks] send in
+                    for track in tracks {
+                        do {
+                            let peaks = try await waveformClient.peaks(track.fileURL, 8_192)
+                            try Task.checkCancellation()
+                            await send(.waveformResponse(songID: songID, trackID: track.id, peaks: peaks))
+                        } catch is CancellationError {
+                            return
+                        } catch {
+                            guard !Task.isCancelled else { return }
+                            await send(.waveformFailureResponse(
+                                songID: songID, trackID: track.id, reason: error.localizedDescription
+                            ))
+                        }
+                    }
+                }
+                .cancellable(id: CancelID.waveforms, cancelInFlight: true)
+
                 return .concatenate(
                     .cancel(id: CancelID.playback),
                     .cancel(id: CancelID.controls),
                     .cancel(id: CancelID.countIn),
                     .cancel(id: CancelID.recording),
-                    loadEffect
+                    .merge(loadEffect, waveformEffect)
                 )
+
+            case let .waveformResponse(songID, trackID, peaks):
+                guard state.songID == songID, state.tracks[id: trackID] != nil else { return .none }
+                state.waveforms[trackID] = peaks
+                state.waveformErrors[trackID] = nil
+                return .none
+
+            case let .waveformFailureResponse(songID, trackID, reason):
+                guard state.songID == songID, state.tracks[id: trackID] != nil else { return .none }
+                state.waveformErrors[trackID] = reason
+                return .none
                 
             case let .loadResponse(duration):
                 guard state.loadPhase == .loading else { return .none }
@@ -240,6 +282,31 @@ struct PlayerFeature {
                 state.destination = Self.alert("재생을 시작하지 못했어요.", reason: reason)
                 return .none
                 
+            case .loopTapped:
+                guard state.loadPhase == .ready,
+                      state.recordingPhase == .idle else { return .none }
+
+                let range: ClosedRange<TimeInterval>?
+                if state.loopRange != nil {
+                    range = nil
+                } else {
+                    guard state.duration.isFinite, state.duration > 0 else { return .none }
+                    let selectedRange = state.activePin?.range ?? 0...state.duration
+                    guard selectedRange.lowerBound.isFinite,
+                          selectedRange.upperBound.isFinite,
+                          selectedRange.lowerBound >= 0,
+                          selectedRange.upperBound <= state.duration,
+                          selectedRange.lowerBound < selectedRange.upperBound else { return .none }
+                    range = selectedRange
+                }
+                state.loopRange = range
+
+                return .run { [audioClient] _ in
+                    try Task.checkCancellation()
+                    await audioClient.setLoop(range)
+                }
+                .cancellable(id: CancelID.controls)
+
             case let .seekChanged(time):
                 guard state.loadPhase == .ready,
                       state.recordingPhase == .idle,
