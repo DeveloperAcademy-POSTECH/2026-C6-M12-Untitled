@@ -464,7 +464,7 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
         monitor = Task { @MainActor [weak self] in
             do {
                 while !Task.isCancelled {
-                    try await Task.sleep(for: .milliseconds(30))
+                    try await Task.sleep(for: .milliseconds(16))
                     guard let self else { return }
                     self.tick()
                 }
