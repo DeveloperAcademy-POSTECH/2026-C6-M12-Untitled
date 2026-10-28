@@ -33,6 +33,7 @@ struct PracticeFeature {
         case songOpened(bpm: Double)
         case feedbackSelected(feedbackID: UUID, range: ClosedRange<TimeInterval>)
         case practiceRangeChanged(range: ClosedRange<TimeInterval>)
+        case loopTapped(duration: TimeInterval, selectedRange: ClosedRange<TimeInterval>?)
         case loopOnTapped
         case loopOffTapped
         case tempoChanged(Float)
@@ -78,15 +79,27 @@ struct PracticeFeature {
                 // 반복이 켜진 중에 구간이 바뀌면 다시 보낼지 미정
                 return .none
                 
+            case let .loopTapped(duration, selectedRange):
+                if state.isLoopEnabled {
+                    return .send(.loopOffTapped)
+                }
+                guard duration.isFinite, duration > 0 else { return .none }
+                let range = selectedRange ?? 0...duration
+                guard range.lowerBound.isFinite, range.upperBound.isFinite,
+                      range.lowerBound >= 0, range.upperBound <= duration,
+                      range.lowerBound < range.upperBound else { return .none }
+
+                state.practiceRange = range
+                return .send(.loopOnTapped)
+
             case .loopOnTapped:
+                guard let range = state.practiceRange else { return .none }
                 state.isLoopEnabled = true
-                // practiceRange가 없을 때의 동작은 미정
-                return .send(.delegate(.playback(.loop(state.practiceRange))))
+                return .send(.delegate(.playback(.loop(range))))
                 
             case .loopOffTapped:
                 state.isLoopEnabled = false
-                // 반복 끄기 명령을 어떻게 보낼지 미정 (.loop(nil)?)
-                return .none
+                return .send(.delegate(.playback(.loop(nil))))
                 
             case let .tempoChanged(tempo):
                 state.tempo = tempo

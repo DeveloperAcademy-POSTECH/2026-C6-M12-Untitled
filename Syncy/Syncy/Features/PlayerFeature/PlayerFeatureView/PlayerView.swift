@@ -86,8 +86,11 @@ struct PlayerView: View {
                 }
             }
 
-            PlayerIconButton(kind: .loop, isActive: store.loopRange != nil) {
-                store.send(.loopTapped)
+            PracticeIconButton(kind: .loop, isActive: store.practice.isLoopEnabled) {
+                store.send(.practice(.loopTapped(
+                    duration: store.duration,
+                    selectedRange: store.activePin?.range
+                )))
             }
         }
     }

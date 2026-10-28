@@ -14,6 +14,7 @@ struct PlayerFeature {
     @ObservableState
     struct State: Equatable {
         var songID: String?
+        var practice = PracticeFeature.State()
         var tracks: IdentifiedArrayOf<TrackState> = []
         var waveforms: [SessionID: WaveformPeaks] = [:]
         var waveformErrors: [SessionID: String] = [:]
@@ -49,9 +50,9 @@ struct PlayerFeature {
     @Dependency(\.waveformClient) var waveformClient
     
     enum Action: Sendable {
+        case practice(PracticeFeature.Action)
         case task
         case playPauseTapped
-        case loopTapped
         case seekChanged(time: TimeInterval)
         case volumeChanged(trackID: SessionID, volume: Float)
         case muteTapped(trackID: SessionID)
@@ -94,6 +95,10 @@ struct PlayerFeature {
     }
     
     var body: some Reducer<State, Action> {
+        Scope(state: \.practice, action: \.practice) {
+            PracticeFeature()
+        }
+
         Reduce { state, action in
             switch action {
             case .task:
@@ -195,6 +200,7 @@ struct PlayerFeature {
                     .cancel(id: CancelID.controls),
                     .cancel(id: CancelID.countIn),
                     .cancel(id: CancelID.recording),
+                    .send(.practice(.songOpened(bpm: song.bpm))),
                     .merge(loadEffect, waveformEffect)
                 )
 
@@ -282,31 +288,6 @@ struct PlayerFeature {
                 state.destination = Self.alert("재생을 시작하지 못했어요.", reason: reason)
                 return .none
                 
-            case .loopTapped:
-                guard state.loadPhase == .ready,
-                      state.recordingPhase == .idle else { return .none }
-
-                let range: ClosedRange<TimeInterval>?
-                if state.loopRange != nil {
-                    range = nil
-                } else {
-                    guard state.duration.isFinite, state.duration > 0 else { return .none }
-                    let selectedRange = state.activePin?.range ?? 0...state.duration
-                    guard selectedRange.lowerBound.isFinite,
-                          selectedRange.upperBound.isFinite,
-                          selectedRange.lowerBound >= 0,
-                          selectedRange.upperBound <= state.duration,
-                          selectedRange.lowerBound < selectedRange.upperBound else { return .none }
-                    range = selectedRange
-                }
-                state.loopRange = range
-
-                return .run { [audioClient] _ in
-                    try Task.checkCancellation()
-                    await audioClient.setLoop(range)
-                }
-                .cancellable(id: CancelID.controls)
-
             case let .seekChanged(time):
                 guard state.loadPhase == .ready,
                       state.recordingPhase == .idle,
@@ -576,7 +557,7 @@ struct PlayerFeature {
                 return .send(.recordingFailureResponse(reason: reason))
                 
             case .audioEvent(.loopWrapped):
-                // PracticeFeature를 연결할 때 .practice(.loopWrapped)로 전달한다.
+                // Practice의 반복 횟수·단계 처리 Action이 정해지면 전달한다.
                 return .none
                 
             case .patchSelected:
@@ -622,7 +603,59 @@ struct PlayerFeature {
                 }
                 .cancellable(id: CancelID.controls)
                 
-            case .destination, .delegate:
+            case let .practice(.delegate(.playback(command))):
+                guard state.loadPhase == .ready,
+                      state.recordingPhase == .idle else {
+                    state.practice.tempo = state.playbackRate
+                    state.practice.isLoopEnabled = state.loopRange != nil
+                    return .none
+                }
+
+                switch command {
+                case let .rate(rate):
+                    guard rate.isFinite, rate > 0 else {
+                        state.practice.tempo = state.playbackRate
+                        return .none
+                    }
+                    let rate = min(max(rate, 1.0 / 32), 32)
+                    state.playbackRate = rate
+                    state.practice.tempo = rate
+                    return .run { [audioClient] _ in
+                        try Task.checkCancellation()
+                        await audioClient.setRate(rate)
+                    }
+                    .cancellable(id: CancelID.controls)
+
+                case let .loop(range):
+                    if let range {
+                        guard range.lowerBound.isFinite, range.upperBound.isFinite,
+                              range.lowerBound >= 0, range.upperBound <= state.duration,
+                              range.lowerBound < range.upperBound else {
+                            state.practice.isLoopEnabled = state.loopRange != nil
+                            return .none
+                        }
+                    }
+                    state.loopRange = range
+                    return .run { [audioClient] _ in
+                        try Task.checkCancellation()
+                        await audioClient.setLoop(range)
+                    }
+                    .cancellable(id: CancelID.controls)
+
+                case .stop:
+                    state.isPlaying = false
+                    state.isChangingPlayback = false
+                    return .concatenate(
+                        .cancel(id: CancelID.playback),
+                        .run { [audioClient] _ in await audioClient.pause() }
+                            .cancellable(id: CancelID.controls)
+                    )
+                }
+
+            case .practice(.delegate(.recordRequested)):
+                return .send(.recordTapped)
+
+            case .practice, .destination, .delegate:
                 return .none
             }
         }

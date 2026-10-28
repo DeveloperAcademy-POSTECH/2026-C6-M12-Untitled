@@ -12,8 +12,6 @@ struct PlayerIconButton: View {
         case record
         case play
         case restart
-        case loop
-        case metronome
     }
     
     let kind: Kind
@@ -41,8 +39,6 @@ struct PlayerIconButton: View {
         case .record: "circle.fill"
         case .play: isActive ? "pause.fill" : "play.fill"
         case .restart: "backward.end.fill"
-        case .loop: "repeat"
-        case .metronome: "metronome.fill"
         }
     }
     
