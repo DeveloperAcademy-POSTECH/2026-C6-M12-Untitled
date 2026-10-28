@@ -21,17 +21,30 @@ struct PlayerTimelineView: View {
     let beatGrid: BeatGrid
     let duration: TimeInterval
     let viewportWidth: CGFloat
+    let isPlaying: Bool
     let isSeekingAllowed: Bool
-    let onSeek: (TimeInterval) -> Void
+    let onSeek: (TimeInterval) async -> Void
     @State private var scrollPosition = ScrollPosition(x: 0)
     @State private var scrollOffset: CGFloat = 0
+    @State private var isUserScrolling = false
+    @State private var zoomScale: CGFloat = 1
+    @State private var zoomStart: (scale: CGFloat, time: TimeInterval, anchorX: CGFloat)?
+    @GestureState private var isZooming = false
 
     private var secondsPerBeat: TimeInterval {
         60 / beatGrid.bpm
     }
 
-    private var pointsPerSecond: CGFloat {
+    private var basePointsPerSecond: CGFloat {
         return viewportWidth / CGFloat(secondsPerBeat * 4 * 10)
+    }
+
+    private var pointsPerSecond: CGFloat {
+        basePointsPerSecond * zoomScale
+    }
+
+    private var minimumZoomScale: CGFloat {
+        min(1, viewportWidth / max(viewportWidth, CGFloat(duration) * basePointsPerSecond))
     }
 
     private var contentWidth: CGFloat {
@@ -55,7 +68,16 @@ struct PlayerTimelineView: View {
             } action: { _, offset in
                 scrollOffset = offset
             }
+            .onScrollPhaseChange { _, phase in
+                switch phase {
+                case .tracking, .interacting, .decelerating:
+                    isUserScrolling = true
+                case .idle, .animating:
+                    isUserScrolling = false
+                }
+            }
             .scrollIndicators(.hidden)
+            .scrollDisabled(isZooming)
 
             PlayerPlayheadView(
                 pointsPerSecond: pointsPerSecond,
@@ -63,7 +85,9 @@ struct PlayerTimelineView: View {
                 viewportWidth: viewportWidth,
                 scrollOffset: scrollOffset,
                 maximumScrollOffset: max(0, contentWidth - viewportWidth),
-                isSeekingAllowed: isSeekingAllowed,
+                isFollowingPlayback: isPlaying && !isUserScrolling && !isZooming,
+                isUserInteracting: isUserScrolling || isZooming,
+                isSeekingAllowed: isSeekingAllowed && !isZooming,
                 onScroll: { offset in scrollPosition.scrollTo(x: offset) },
                 onSeek: onSeek
             )
@@ -72,6 +96,36 @@ struct PlayerTimelineView: View {
         .frame(height: PlayerLayout.rulerHeight + CGFloat(tracks.count) * PlayerLayout.rowHeight)
         .coordinateSpace(name: "playerTimeline")
         .background(Color("Surface2"))
+        .simultaneousGesture(zoomGesture)
+        .onChange(of: isZooming) { _, isZooming in
+            if !isZooming { zoomStart = nil }
+        }
+    }
+
+    private var zoomGesture: some Gesture {
+        MagnifyGesture()
+            .updating($isZooming) { _, isZooming, _ in
+                isZooming = true
+            }
+            .onChanged { value in
+                if zoomStart == nil {
+                    let anchorX = min(max(0, value.startLocation.x), viewportWidth)
+                    zoomStart = (zoomScale, Double((scrollOffset + anchorX) / pointsPerSecond), anchorX)
+                }
+                guard let start = zoomStart else { return }
+                let scale = min(max(start.scale * value.magnification, minimumZoomScale), 8)
+                zoomScale = scale
+                let newPointsPerSecond = basePointsPerSecond * scale
+                let maximumOffset = max(0, CGFloat(duration) * newPointsPerSecond - viewportWidth)
+                let offset = min(max(0, CGFloat(start.time) * newPointsPerSecond - start.anchorX), maximumOffset)
+                scrollPosition.scrollTo(x: offset)
+            }
+    }
+
+    private func seek(at x: CGFloat) {
+        guard isSeekingAllowed, !isZooming else { return }
+        let target = min(max(0, Double(x / pointsPerSecond)), duration)
+        Task { await onSeek(target) }
     }
 
     private var ruler: some View {
@@ -81,6 +135,17 @@ struct PlayerTimelineView: View {
             let subdivision = secondsPerBeat / 4
             let visibleDuration = Double(size.width / pointsPerSecond)
             let ticks = Int(max(0, (visibleDuration - beatGrid.firstBeatOffset) / subdivision))
+            let labelFont = Font.system(size: 12, weight: .light)
+            let sampleLabel = Text(String(repeating: "8", count: String(ticks / 16 + 1).count))
+                .font(labelFont)
+            let labelWidth = context.resolve(sampleLabel)
+                .measure(in: CGSize(width: CGFloat.infinity, height: 25)).width
+            let pointsPerBar = CGFloat(secondsPerBeat * 4) * pointsPerSecond
+            var labelInterval = 1
+            // 숫자 폭과 여백이 확보되도록 1·2·4·8마디 단위로 표시 간격을 늘린다.
+            while CGFloat(labelInterval) * pointsPerBar < labelWidth + 10 {
+                labelInterval *= 2
+            }
             var measureLines = Path()
             var beatLines = Path()
             for tick in 0...ticks {
@@ -90,10 +155,12 @@ struct PlayerTimelineView: View {
                 if tick.isMultiple(of: 16) {
                     measureLines.move(to: CGPoint(x: x, y: 0))
                     measureLines.addLine(to: CGPoint(x: x, y: size.height))
-                    context.draw(
-                        Text("\(tick / 16 + 1)").font(.system(size: 12, weight: .light)).foregroundStyle(Color("Gray100")),
-                        at: CGPoint(x: x + 5, y: 12), anchor: .leading
-                    )
+                    if (tick / 16).isMultiple(of: labelInterval) {
+                        context.draw(
+                            Text("\(tick / 16 + 1)").font(labelFont).foregroundStyle(Color("Gray100")),
+                            at: CGPoint(x: x + 5, y: 12), anchor: .leading
+                        )
+                    }
                 } else {
                     beatLines.move(to: CGPoint(x: x, y: size.height - (tick.isMultiple(of: 4) ? 14 : 7)))
                     beatLines.addLine(to: CGPoint(x: x, y: size.height))
@@ -105,13 +172,13 @@ struct PlayerTimelineView: View {
         .frame(height: PlayerLayout.rulerHeight)
         .contentShape(Rectangle())
         .onTapGesture { location in
-            onSeek(min(max(0, Double(location.x / pointsPerSecond)), duration))
+            seek(at: location.x)
         }
     }
 
     private func lane(_ track: TrackState) -> some View {
         VStack(spacing: 0) {
-            UnevenRoundedRectangle(topLeadingRadius: 8, topTrailingRadius: 8)
+            Rectangle()
                 .fill(Color("Surface3"))
                 .frame(height: 16)
 
@@ -136,6 +203,10 @@ struct PlayerTimelineView: View {
         }
         .padding(.vertical, 2)
         .frame(height: PlayerLayout.rowHeight)
+        .contentShape(Rectangle())
+        .onTapGesture { location in
+            seek(at: location.x)
+        }
     }
 }
 
@@ -145,18 +216,22 @@ private struct PlayerPlayheadView: View {
     let viewportWidth: CGFloat
     let scrollOffset: CGFloat
     let maximumScrollOffset: CGFloat
+    let isFollowingPlayback: Bool
+    let isUserInteracting: Bool
     let isSeekingAllowed: Bool
     let onScroll: (CGFloat) -> Void
-    let onSeek: (TimeInterval) -> Void
+    let onSeek: (TimeInterval) async -> Void
     @Dependency(\.audioClient) private var audioClient
     @Dependency(\.continuousClock) private var clock
     @State private var time: TimeInterval = 0
     @State private var dragLocation: CGFloat?
     @State private var dragStart: (time: TimeInterval, location: CGFloat, scrollOffset: CGFloat)?
+    @State private var pendingSeek: TimeInterval?
     @GestureState private var isDragging = false
+    @State private var isFollowSuspended = false
 
     private var displayedTime: TimeInterval {
-        guard let dragLocation else { return time }
+        guard let dragLocation else { return pendingSeek ?? time }
         return seekTime(at: dragLocation)
     }
 
@@ -215,13 +290,15 @@ private struct PlayerPlayheadView: View {
                                 isDragging = true
                             }
                             .onChanged { value in
+                                guard isSeekingAllowed else { return }
                                 if dragStart == nil {
-                                    dragStart = (time, value.startLocation.x, scrollOffset)
+                                    dragStart = (displayedTime, value.startLocation.x, scrollOffset)
                                 }
                                 dragLocation = value.location.x
                             }
                             .onEnded { value in
-                                onSeek(seekTime(at: value.location.x))
+                                guard isSeekingAllowed else { return }
+                                pendingSeek = seekTime(at: value.location.x)
                             }
                     )
                     .allowsHitTesting(isSeekingAllowed && isVisible)
@@ -229,10 +306,21 @@ private struct PlayerPlayheadView: View {
         }
         .opacity(isVisible ? 1 : 0)
         .onChange(of: isDragging) { _, isDragging in
-            if !isDragging {
+            if isDragging {
+                isFollowSuspended = true
+            } else {
                 dragLocation = nil
                 dragStart = nil
             }
+        }
+        .onChange(of: isUserInteracting) { _, isUserInteracting in
+            if isUserInteracting { isFollowSuspended = true }
+        }
+        .onChange(of: isFollowingPlayback) { _, isFollowingPlayback in
+            if isFollowingPlayback { followPlayback(at: time) }
+        }
+        .onChange(of: time) { _, time in
+            followPlayback(at: time)
         }
         .task(id: autoScrollOffset) {
             guard let offset = autoScrollOffset else { return }
@@ -244,13 +332,36 @@ private struct PlayerPlayheadView: View {
                 return
             }
         }
-        .task {
+        .task(id: pendingSeek) {
+            guard let target = pendingSeek else { return }
+            await onSeek(target)
+            guard !Task.isCancelled else { return }
+            time = target
+            pendingSeek = nil
+        }
+        .task(id: pendingSeek) {
+            // 이동 중 받은 이전 위치는 버리고, 이동이 끝나면 엔진의 현재 위치부터 다시 받는다.
+            guard pendingSeek == nil else { return }
             for await time in await audioClient.position() {
                 guard !Task.isCancelled else { return }
                 guard time.isFinite, time >= 0 else { continue }
                 self.time = time
             }
         }
+    }
+
+    private func followPlayback(at time: TimeInterval) {
+        guard isFollowingPlayback, !isDragging, pendingSeek == nil else { return }
+        let x = CGFloat(time) * pointsPerSecond
+        // 사용자가 재생선을 화면 밖으로 옮겼다면, 다시 화면에 들어올 때까지 기다린다.
+        if isFollowSuspended {
+            guard x >= scrollOffset, x <= scrollOffset + viewportWidth else { return }
+            isFollowSuspended = false
+        }
+        // 중앙에 도달한 뒤에는 재생선을 따라 스크롤하고, 반복으로 되돌아간 위치도 보여준다.
+        guard x - scrollOffset >= viewportWidth / 2 || x < scrollOffset else { return }
+        let offset = min(max(0, x - viewportWidth / 2), maximumScrollOffset)
+        if offset != scrollOffset { onScroll(offset) }
     }
 
     private func seekTime(at location: CGFloat) -> TimeInterval {

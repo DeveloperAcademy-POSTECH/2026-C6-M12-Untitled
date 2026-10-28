@@ -95,27 +95,25 @@ struct PlayerView: View {
     private var trackArea: some View {
         GeometryReader { geometry in
             let timelineWidth = max(1, geometry.size.width - PlayerLayout.headerWidth)
-            ScrollView(.vertical) {
-                HStack(alignment: .top, spacing: 0) {
-                    trackHeaders
-                        .frame(minHeight: geometry.size.height, alignment: .top)
+            HStack(alignment: .top, spacing: 0) {
+                trackHeaders
+                    .frame(minHeight: geometry.size.height, alignment: .top)
 
-                    PlayerTimelineView(
-                        tracks: displayedTracks,
-                        waveforms: store.waveforms,
-                        waveformErrors: store.waveformErrors,
-                        beatGrid: beatGrid,
-                        duration: store.duration,
-                        viewportWidth: timelineWidth,
-                        isSeekingAllowed: store.recordingPhase == .idle,
-                        onSeek: { store.send(.seekChanged(time: $0)) }
-                    )
-                    .frame(width: timelineWidth)
-                    .zIndex(1)
-                }
-                .frame(minHeight: geometry.size.height, alignment: .top)
+                PlayerTimelineView(
+                    tracks: displayedTracks,
+                    waveforms: store.waveforms,
+                    waveformErrors: store.waveformErrors,
+                    beatGrid: beatGrid,
+                    duration: store.duration,
+                    viewportWidth: timelineWidth,
+                    isPlaying: store.isPlaying,
+                    isSeekingAllowed: store.recordingPhase == .idle,
+                    onSeek: { await store.send(.seekChanged(time: $0)).finish() }
+                )
+                .frame(width: timelineWidth)
+                .zIndex(1)
             }
-            .scrollIndicators(.hidden)
+            .frame(minHeight: geometry.size.height, alignment: .top)
         }
         .background(Color("Surface2"))
     }
