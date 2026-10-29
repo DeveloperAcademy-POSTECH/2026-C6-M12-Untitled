@@ -25,7 +25,12 @@ struct PracticeIconButton: View {
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(isActive ? Color.black : Color("Gray100"))
                 .frame(width: 57, height: 34)
-                .background(isActive ? Color("Gray100") : Color("Surface3"))
+                .background(isActive ? Color("Gray100") : Color("Surface3"), in: UnevenRoundedRectangle(
+                    topLeadingRadius: kind == .metronome ? 8 : 0,
+                    bottomLeadingRadius: kind == .metronome ? 8 : 0,
+                    bottomTrailingRadius: 8,
+                    topTrailingRadius: 8
+                ))
                 .padding(.vertical, 5)
                 .contentShape(Rectangle())
         }
@@ -56,13 +61,18 @@ struct PlaybackSpeedButton: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(Color("Gray300"))
 
-                Text("\(Int((rate * 100).rounded()))%")
+                Text("100%")
+                    .hidden()
+                    .overlay {
+                        Text("\(Int((rate * 100).rounded()))%")
+                    }
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(.white)
 
                 Text("▾")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.system(size: 20, weight: .medium))
                     .foregroundStyle(Color("Gray300"))
+                    .offset(y: -1)
             }
             .padding(.leading, 12)
             .padding(.trailing, 10)

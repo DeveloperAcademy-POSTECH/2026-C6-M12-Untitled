@@ -27,7 +27,10 @@ struct PlayerIconButton: View {
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(iconColor)
                 .frame(width: 57, height: 34)
-                .background(backgroundColor)
+                .background(backgroundColor, in: UnevenRoundedRectangle(
+                    topLeadingRadius: kind == .restart ? 8 : 0,
+                    bottomLeadingRadius: kind == .restart ? 8 : 0
+                ))
                 .padding(.vertical, 5)
                 .contentShape(Rectangle())
         }
