@@ -400,7 +400,7 @@ struct PlayerFeature {
                       let pin = state.activePin,
                       state.tracks[id: pin.sessionID] != nil,
                       let beatGrid = state.beatGrid,
-                      beatGrid.bpm.isFinite, beatGrid.bpm > 0,
+                      beatGrid.bpm > 0,
                       pin.range.lowerBound.isFinite,
                       pin.range.upperBound.isFinite,
                       pin.range.lowerBound >= 0,
@@ -430,7 +430,7 @@ struct PlayerFeature {
                                 await audioClient.click(beat == 1)
                                 try Task.checkCancellation()
                                 await send(.countInTicked)
-                                try await clock.sleep(for: .seconds(60 / bpm))
+                                try await clock.sleep(for: .seconds(60 / Double(bpm)))
                             }
                             await send(.countInFinished)
                         } catch is CancellationError {

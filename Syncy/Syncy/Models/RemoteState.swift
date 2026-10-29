@@ -10,7 +10,7 @@ import Foundation
 struct RemoteState: Equatable, Codable {
     var version: Int
     var songJobId: String?
-    var songBPM: Double?
+    var songBPM: Int?
     var firstBeatOffset: TimeInterval?
     var feedback: [FeedbackItem]?
     var patches: [Patch]?

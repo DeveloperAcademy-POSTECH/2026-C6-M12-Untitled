@@ -20,7 +20,7 @@ struct PracticeFeature {
         var candidates: [FeedbackItem] = []    // 미정: 후보를 채우는 시점
         var isMetronomeEnabled: Bool = false   // 미정: 기본값
         var metronomeVolume: Int = 100         // 미정: 기본값 (0~100)
-        var metronomeBPM: Double = 120         // 미정: 기본값 (0보다 큼). 곡이 열리면 곡 BPM으로 바뀜
+        var metronomeBPM: Int = 120         // 미정: 기본값 (0보다 큼). 곡이 열리면 곡 BPM으로 바뀜
     }
     
     nonisolated private enum CancelID: Hashable, Sendable {
@@ -30,7 +30,7 @@ struct PracticeFeature {
     @Dependency(\.audioClient) var audioClient
     
     enum Action: Sendable {
-        case songOpened(bpm: Double)
+        case songOpened(bpm: Int)
         case feedbackSelected(feedbackID: UUID, range: ClosedRange<TimeInterval>)
         case practiceRangeChanged(range: ClosedRange<TimeInterval>)
         case loopTapped(duration: TimeInterval, selectedRange: ClosedRange<TimeInterval>?)
@@ -40,7 +40,7 @@ struct PracticeFeature {
         case metronomeOnTapped
         case metronomeOffTapped
         case metronomeVolumeChanged(Int)
-        case metronomeBPMChanged(Double)
+        case metronomeBPMChanged(Int)
         case practiceRequested(FeedbackItem)
         case practiceStartTapped
         case candidateSelected(id: FeedbackItem.ID)

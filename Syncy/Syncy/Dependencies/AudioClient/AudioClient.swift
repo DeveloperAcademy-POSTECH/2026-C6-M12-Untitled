@@ -27,7 +27,7 @@ struct AudioClient {
     var cancelRecording: () async -> Void
     var click: (_ accent: Bool) async -> Void
     /// volume은 설계의 메트로놈 볼륨 범위인 0~100이다.
-    var setMetronome: (_ on: Bool, _ bpm: Double, _ volume: Float) async -> Void
+    var setMetronome: (_ on: Bool, _ bpm: Int, _ volume: Float) async -> Void
     var events: () async -> AsyncStream<AudioEvent> = {
         AsyncStream { continuation in
             continuation.finish()

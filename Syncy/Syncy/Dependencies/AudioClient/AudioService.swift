@@ -364,10 +364,10 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
     }
 
     /// 문서의 메트로놈 볼륨 범위(0~100)를 Float로 받는다.
-    func setMetronome(_ on: Bool, bpm: Double, volume: Float) {
+    func setMetronome(_ on: Bool, bpm: Int, volume: Float) {
         metronomeNode.stop()
-        guard on, bpm.isFinite, bpm > 0, volume.isFinite else { return }
-        let frames = clickFormat.sampleRate * 60 / bpm
+        guard on, bpm > 0, volume.isFinite else { return }
+        let frames = clickFormat.sampleRate * 60 / Double(bpm)
         // 비정상 BPM으로 지나치게 큰 버퍼가 할당되는 것을 막는다(한 마디 최대 60초).
         guard frames >= 1, frames <= clickFormat.sampleRate * 15 else { return }
         let perBeat = Int(frames.rounded())

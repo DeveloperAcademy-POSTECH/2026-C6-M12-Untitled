@@ -134,24 +134,24 @@ struct PlaybackSpeedButton: View {
 
 struct MetronomeSettingsButton: View {
     let isEnabled: Bool
-    let bpm: Double
+    let bpm: Int
     let volume: Int
     let onEnabledChanged: (Bool) -> Void
-    let onBPMChanged: (Double) -> Void
+    let onBPMChanged: (Int) -> Void
     let onVolumeChanged: (Int) -> Void
 
     @State private var isPresented = false
     @State private var bpmText = ""
     @FocusState private var isBPMFocused: Bool
 
-    private let bpmRange = 30.0...300.0
+    private let bpmRange = 30...300
 
     var body: some View {
         PracticeIconButton(kind: .metronome, isActive: isEnabled) {
             if isPresented {
                 commitBPM()
             } else {
-                bpmText = bpmInput(bpm)
+                bpmText = String(bpm)
             }
             isBPMFocused = false
             isPresented.toggle()
@@ -167,7 +167,7 @@ struct MetronomeSettingsButton: View {
         }
         .onChange(of: bpm) { _, value in
             if !isBPMFocused {
-                bpmText = bpmInput(value)
+                bpmText = String(value)
             }
         }
         .onDisappear { isPresented = false }
@@ -198,7 +198,7 @@ struct MetronomeSettingsButton: View {
                     TextField("BPM", text: $bpmText)
                         .font(.system(size: 15, weight: .bold))
                         .multilineTextAlignment(.center)
-                        .keyboardType(.decimalPad)
+                        .keyboardType(.numberPad)
                         .submitLabel(.done)
                         .focused($isBPMFocused)
                         .frame(width: 48, height: 32)
@@ -244,31 +244,26 @@ struct MetronomeSettingsButton: View {
     }
 
     private func commitBPM() {
-        guard let value = Double(bpmText), value.isFinite else {
-            bpmText = bpmInput(bpm)
+        guard let value = Int(bpmText) else {
+            bpmText = String(bpm)
             return
         }
         guard value != bpm else {
-            bpmText = bpmInput(bpm)
+            bpmText = String(bpm)
             return
         }
         updateBPM(value)
     }
 
-    private func changeBPM(by amount: Double) {
-        let value = Double(bpmText).flatMap { $0.isFinite ? $0 : nil } ?? bpm
+    private func changeBPM(by amount: Int) {
+        let value = min(max(Int(bpmText) ?? bpm, bpmRange.lowerBound), bpmRange.upperBound)
         updateBPM(value + amount)
         isBPMFocused = false
     }
 
-    private func updateBPM(_ value: Double) {
+    private func updateBPM(_ value: Int) {
         let value = min(max(value, bpmRange.lowerBound), bpmRange.upperBound)
-        bpmText = bpmInput(value)
+        bpmText = String(value)
         if value != bpm { onBPMChanged(value) }
-    }
-
-    private func bpmInput(_ value: Double) -> String {
-        let text = String(value)
-        return text.hasSuffix(".0") ? String(text.dropLast(2)) : text
     }
 }

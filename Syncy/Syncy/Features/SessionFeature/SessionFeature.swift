@@ -17,7 +17,7 @@ struct SessionFeature{
         var selectedFileURL: URL?
         var separationJobID: String?
         var tracks: [SongTrack] = []
-        var songBPM : Double = 120
+        var songBPM : Int = 120
         var firstBeatOffset: TimeInterval = 0
         var serverURL: URL? = ServerConfig.separationBaseURL
         var serverStatus: ServerStatus = .searching
@@ -31,7 +31,7 @@ struct SessionFeature{
 
     enum Action: Equatable{
         case fileSelected(fileURL: URL)
-        case songInfoEntered(bpm: Double, firstBeat: TimeInterval)
+        case songInfoEntered(bpm: Int, firstBeat: TimeInterval)
         case startSeparationTapped
         case uploadSuccessResponse(jobID: String)
         case uploadFailureResponse(reason: String)

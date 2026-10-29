@@ -9,6 +9,6 @@ import Foundation
 struct Song: Equatable{
     var id: String
     var tracks: [SongTrack]
-    var bpm : Double = 120
+    var bpm : Int = 120
     var firstBeatOffset : TimeInterval
 }
