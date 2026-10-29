@@ -32,7 +32,7 @@ struct PlayerTimelineView: View {
     @GestureState private var isZooming = false
 
     private var secondsPerBeat: TimeInterval {
-        60 / beatGrid.bpm
+        60 / Double(beatGrid.bpm)
     }
 
     private var basePointsPerSecond: CGFloat {

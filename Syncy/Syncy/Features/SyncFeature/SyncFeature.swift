@@ -44,7 +44,7 @@ struct SyncFeature {
         case delegate(Delegate)
         enum Delegate: Equatable {
             case remoteStateReady(RemoteState)
-            case sharedSongChanged(jobID: String, bpm: Double, firstBeatOffset: TimeInterval)
+            case sharedSongChanged(jobID: String, bpm: Int, firstBeatOffset: TimeInterval)
         }
     }
 

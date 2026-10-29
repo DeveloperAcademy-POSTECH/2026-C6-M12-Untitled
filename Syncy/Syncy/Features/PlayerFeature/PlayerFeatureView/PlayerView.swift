@@ -11,12 +11,21 @@ import ComposableArchitecture
 struct PlayerView: View {
     @Bindable var store: StoreOf<PlayerFeature>
     let beatGrid: BeatGrid
+    @State private var presentedPracticePopover: PracticePopover?
     // TODO: 파트별 멤버 데이터가 연결되면 TrackHeaderView에 필수 이름을 전달한다.
 
     var body: some View {
         VStack(spacing: 0) {
             topBar
+                .zIndex(1)
             trackArea
+                .overlay {
+                    if presentedPracticePopover != nil {
+                        Color.clear
+                            .contentShape(Rectangle())
+                            .onTapGesture { presentedPracticePopover = nil }
+                    }
+                }
         }
         .foregroundStyle(Color("Gray100"))
         .background(Color("Surface1"))
@@ -33,6 +42,7 @@ struct PlayerView: View {
         HStack(spacing: 16) {
             HStack(spacing: 1) {
                 Button {
+                    presentedPracticePopover = nil
                     // 뒤로가기 버튼 Action
                 } label: {
                     Image(systemName: "chevron.left")
@@ -52,7 +62,10 @@ struct PlayerView: View {
             HStack(spacing: 12) {
                 playbackControls
                 PlayerPlaybackPositionView(beatGrid: beatGrid)
-
+                PracticePanel(
+                    store: store.scope(state: \.practice, action: \.practice),
+                    presentedPopover: $presentedPracticePopover
+                )
             }
             .fixedSize()
 
@@ -62,20 +75,26 @@ struct PlayerView: View {
         .padding(.trailing, 16)
         .frame(maxWidth: .infinity)
         .frame(height: 52)
-        .background(Color("Surface2"))
+        .background {
+            Color("Surface2")
+                .onTapGesture { presentedPracticePopover = nil }
+        }
     }
 
     private var playbackControls: some View {
         HStack(spacing: 2) {
             PlayerIconButton(kind: .restart) {
+                presentedPracticePopover = nil
                 store.send(.seekChanged(time: 0))
             }
 
             PlayerIconButton(kind: .play, isActive: store.isPlaying) {
+                presentedPracticePopover = nil
                 store.send(.playPauseTapped)
             }
 
             PlayerIconButton(kind: .record, isActive: store.recordingPhase != .idle) {
+                presentedPracticePopover = nil
                 switch store.recordingPhase {
                 case .idle:
                     store.send(.recordTapped)
@@ -86,8 +105,12 @@ struct PlayerView: View {
                 }
             }
 
-            PlayerIconButton(kind: .loop, isActive: store.loopRange != nil) {
-                store.send(.loopTapped)
+            PracticeIconButton(kind: .loop, isActive: store.practice.isLoopEnabled) {
+                presentedPracticePopover = nil
+                store.send(.practice(.loopTapped(
+                    duration: store.duration,
+                    selectedRange: store.activePin?.range
+                )))
             }
         }
     }
@@ -165,48 +188,3 @@ private struct PlayerPlaybackPositionView: View {
         beatGrid.position(at: time)
     }
 }
-
-#Preview("가로 모드", traits: .landscapeLeft) {
-    PlayerPreview.makeView()
-}
-
-#if DEBUG
-private enum PlayerPreview {
-    static func makeView() -> some View {
-        let order: [SessionID] = [.vocals, .piano, .guitar, .drums, .bass]
-        var state = PlayerFeature.State()
-        state.loadPhase = .ready
-        state.duration = 20
-        let beatGrid = BeatGrid(bpm: 120, firstBeatOffset: 0)
-        state.beatGrid = beatGrid
-        state.tracks = IdentifiedArray(uniqueElements: order.map {
-            TrackState(id: $0, volume: 0.8, isMuted: false, activePatchIDs: [])
-        })
-        for (index, id) in order.enumerated() {
-            // 파형 예시는 Preview에서만 만들며, 실제 화면은 WaveformClient의 결과를 쓴다.
-            let samples = (0..<1_600).map { sample -> Float in
-                let phase = Double(sample) / 1_600
-                let pulse = abs(sin(phase * .pi * Double(index == 0 ? 5 : 20)))
-                let detail = 0.4 + 0.6 * abs(sin(Double(sample) * Double(index + 3)))
-                return Float(max(0.02, pulse * detail))
-            }
-            state.waveforms[id] = WaveformPeaks(samples: samples, duration: 20)
-        }
-        return withDependencies {
-            var audioClient = AudioClient()
-            audioClient.play = {}
-            audioClient.pause = {}
-            audioClient.seek = { _ in }
-            audioClient.setVolume = { _, _ in }
-            audioClient.setMuted = { _, _ in }
-            audioClient.setSolo = { _ in }
-            audioClient.setLoop = { _ in }
-            audioClient.events = { AsyncStream { $0.finish() } }
-            audioClient.position = { AsyncStream { $0.yield(0); $0.finish() } }
-            $0.audioClient = audioClient
-        } operation: {
-            PlayerView(store: Store(initialState: state) { PlayerFeature() }, beatGrid: beatGrid)
-        }
-    }
-}
-#endif

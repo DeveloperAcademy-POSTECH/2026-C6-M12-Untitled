@@ -12,8 +12,6 @@ struct PlayerIconButton: View {
         case record
         case play
         case restart
-        case loop
-        case metronome
     }
     
     let kind: Kind
@@ -29,7 +27,10 @@ struct PlayerIconButton: View {
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(iconColor)
                 .frame(width: 57, height: 34)
-                .background(backgroundColor)
+                .background(backgroundColor, in: UnevenRoundedRectangle(
+                    topLeadingRadius: kind == .restart ? 8 : 0,
+                    bottomLeadingRadius: kind == .restart ? 8 : 0
+                ))
                 .padding(.vertical, 5)
                 .contentShape(Rectangle())
         }
@@ -41,8 +42,6 @@ struct PlayerIconButton: View {
         case .record: "circle.fill"
         case .play: isActive ? "pause.fill" : "play.fill"
         case .restart: "backward.end.fill"
-        case .loop: "repeat"
-        case .metronome: "metronome.fill"
         }
     }
     

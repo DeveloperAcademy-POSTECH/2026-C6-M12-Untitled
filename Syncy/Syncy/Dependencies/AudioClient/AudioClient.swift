@@ -10,7 +10,7 @@ import Foundation
 
 @DependencyClient
 struct AudioClient {
-    var load: (_ tracks: [SongTrack]) async throws -> TimeInterval
+    var load: (_ tracks: [SongTrack], _ beatGrid: BeatGrid) async throws -> TimeInterval
     var play: () async throws -> Void
     var pause: () async -> Void
     var seek: (_ time: TimeInterval) async -> Void
@@ -27,7 +27,7 @@ struct AudioClient {
     var cancelRecording: () async -> Void
     var click: (_ accent: Bool) async -> Void
     /// volume은 설계의 메트로놈 볼륨 범위인 0~100이다.
-    var setMetronome: (_ on: Bool, _ bpm: Double, _ volume: Float) async -> Void
+    var setMetronome: (_ on: Bool, _ bpm: Int, _ volume: Float) async -> Void
     var events: () async -> AsyncStream<AudioEvent> = {
         AsyncStream { continuation in
             continuation.finish()
@@ -44,7 +44,7 @@ extension AudioClient: DependencyKey {
     static let liveValue: Self = {
         let service = AudioService()
         return Self(
-            load: { try await service.load($0) },
+            load: { try await service.load($0, beatGrid: $1) },
             play: { try service.play() },
             pause: { service.pause() },
             seek: { service.seek($0) },

@@ -58,7 +58,7 @@ struct SessionView: View {
         HStack(spacing: 16) {
             LabeledContent("BPM") {
                 TextField("120", text: $bpmText)
-                    .keyboardType(.decimalPad)
+                    .keyboardType(.numberPad)
                     .multilineTextAlignment(.trailing)
                     .frame(width: 80)
                     .textFieldStyle(.roundedBorder)
@@ -78,7 +78,7 @@ struct SessionView: View {
 
     private func sendSongInfo() {
         // 숫자가 아니면 보내지 않는다 (직전 값을 유지)
-        guard let bpm = Double(bpmText), bpm > 0,
+        guard let bpm = Int(bpmText), bpm > 0,
               let firstBeat = Double(firstBeatText), firstBeat >= 0 else { return }
         store.send(.songInfoEntered(bpm: bpm, firstBeat: firstBeat))
     }

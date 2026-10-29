@@ -45,7 +45,14 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
     private let engine = AVAudioEngine()
     private let clickNode = AVAudioPlayerNode()
     private let metronomeNode = AVAudioPlayerNode()
+    private let metronomePitch = AVAudioUnitTimePitch()
     private let clickFormat = AVAudioFormat(standardFormatWithSampleRate: 44_100, channels: 1)!
+    private var isMetronomeEnabled = false
+    private var metronomeBPM = 120
+    private var firstBeatOffset: TimeInterval = 0
+    private var metronomeStartElapsed: TimeInterval = 0
+    private lazy var accentedClick = clickBuffer(accent: true)
+    private lazy var regularClick = clickBuffer(accent: false)
     private var tracks: [SessionID: Track] = [:]
     private var patches: [UUID: PatchPlayer] = [:]
     private var duration: TimeInterval = 0
@@ -70,10 +77,12 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
 
     override init() {
         super.init()
-        for node in [clickNode, metronomeNode] {
-            engine.attach(node)
-            engine.connect(node, to: engine.mainMixerNode, format: clickFormat)
-        }
+        engine.attach(clickNode)
+        engine.connect(clickNode, to: engine.mainMixerNode, format: clickFormat)
+        engine.attach(metronomeNode)
+        engine.attach(metronomePitch)
+        engine.connect(metronomeNode, to: metronomePitch, format: clickFormat)
+        engine.connect(metronomePitch, to: engine.mainMixerNode, format: clickFormat)
     }
 
     deinit {
@@ -85,9 +94,13 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
 
     // MARK: - 곡 로드 · 재생
 
-    func load(_ songTracks: [SongTrack]) async throws -> TimeInterval {
+    func load(_ songTracks: [SongTrack], beatGrid: BeatGrid) async throws -> TimeInterval {
         try Task.checkCancellation()
         guard !songTracks.isEmpty else { throw AudioServiceError.noTracks }
+        guard beatGrid.bpm > 0, beatGrid.firstBeatOffset.isFinite,
+              beatGrid.firstBeatOffset >= 0, beatGrid.beatsPerBar == 4 else {
+            throw AudioServiceError.invalidAudio
+        }
         var loaded: [SessionID: Track] = [:]
         for songTrack in songTracks {
             guard loaded[songTrack.id] == nil else { throw AudioServiceError.invalidAudio }
@@ -106,6 +119,9 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
         patches = [:]
         tracks = loaded
         rate = 1
+        metronomePitch.rate = 1
+        metronomeBPM = beatGrid.bpm
+        firstBeatOffset = beatGrid.firstBeatOffset
         loopRange = nil
         soloTrackID = nil
         pausedPosition = 0
@@ -158,6 +174,7 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
         rate = newRate
         for track in tracks.values { track.pitch.rate = rate }
         for player in patches.values { player.pitch.rate = rate }
+        metronomePitch.rate = rate
     }
 
     func setLoop(_ range: ClosedRange<TimeInterval>?) {
@@ -291,6 +308,7 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
         rate = 1
         for track in tracks.values { track.pitch.rate = 1 }
         for player in patches.values { player.pitch.rate = 1 }
+        metronomePitch.rate = 1
         applyMix()
         do {
             try startPlayback(from: range.lowerBound)
@@ -364,30 +382,50 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
     }
 
     /// 문서의 메트로놈 볼륨 범위(0~100)를 Float로 받는다.
-    func setMetronome(_ on: Bool, bpm: Double, volume: Float) {
+    func setMetronome(_ on: Bool, bpm: Int, volume: Float) {
+        guard bpm > 0, volume.isFinite else { return }
+        let needsScheduling = on != isMetronomeEnabled || bpm != metronomeBPM
+        isMetronomeEnabled = on
+        metronomeBPM = bpm
+        metronomeNode.volume = min(max(volume, 0), 100) / 100
+        guard needsScheduling else { return }
         metronomeNode.stop()
-        guard on, bpm.isFinite, bpm > 0, volume.isFinite else { return }
-        let frames = clickFormat.sampleRate * 60 / bpm
-        // 비정상 BPM으로 지나치게 큰 버퍼가 할당되는 것을 막는다(한 마디 최대 60초).
-        guard frames >= 1, frames <= clickFormat.sampleRate * 15 else { return }
-        let perBeat = Int(frames.rounded())
-        guard let bar = AVAudioPCMBuffer(pcmFormat: clickFormat, frameCapacity: AVAudioFrameCount(perBeat * 4)),
-              let samples = bar.floatChannelData?[0] else { return }
-        bar.frameLength = bar.frameCapacity
-        samples.initialize(repeating: 0, count: Int(bar.frameLength))
-        for beat in 0..<4 {
-            guard let click = clickBuffer(accent: beat == 0), let source = click.floatChannelData?[0] else { return }
-            for index in 0..<min(perBeat, Int(click.frameLength)) {
-                samples[beat * perBeat + index] = source[index]
+        // 켜기 상태는 보관하되, 곡이 재생 중일 때만 엔진에 클릭을 예약한다.
+        guard on, isPlaying else { return }
+        startMetronome()
+    }
+
+    private func scheduleMetronome(from start: TimeInterval, to end: TimeInterval, offset: TimeInterval) {
+        guard isMetronomeEnabled, start < end else { return }
+        let interval = 60 / Double(metronomeBPM)
+        guard interval * clickFormat.sampleRate >= 1, interval <= 15 else { return }
+        let first = max(0, ceil((start - firstBeatOffset) / interval - 1e-9))
+        let last = max(first, ceil((end - firstBeatOffset) / interval - 1e-9))
+        guard last < Double(Int.max) else { return }
+        for beat in Int(first)..<Int(last) {
+            let position = firstBeatOffset + Double(beat) * interval
+            guard let click = beat.isMultiple(of: 4) ? accentedClick : regularClick else { continue }
+            let sample = AVAudioFramePosition((max(0, offset + position - start) * clickFormat.sampleRate).rounded())
+            metronomeNode.scheduleBuffer(click, at: AVAudioTime(sampleTime: sample, atRate: clickFormat.sampleRate))
+        }
+    }
+
+    private func startMetronome() {
+        // 재생 중 켜거나 BPM을 바꿔도 트랙과 같은 시계로 다음 박을 예약한다.
+        let hostStart = max(hostTime + 0.05, hostAnchor)
+        metronomeStartElapsed = elapsedAtAnchor + max(0, hostStart - hostAnchor) * Double(rate)
+        let position = playbackPosition(at: metronomeStartElapsed)
+        let end = playbackLoop?.upperBound ?? duration
+        scheduleMetronome(from: position, to: end, offset: 0)
+        if let range = playbackLoop {
+            var offset = metronomeStartElapsed + end - position
+            while offset < scheduledUntil - 1e-9 {
+                scheduleMetronome(from: range.lowerBound, to: range.upperBound, offset: offset - metronomeStartElapsed)
+                offset += range.upperBound - range.lowerBound
             }
         }
-        do {
-            try configureSession()
-            try startEngine()
-            metronomeNode.volume = min(max(volume, 0), 100) / 100
-            metronomeNode.scheduleBuffer(bar, at: nil, options: .loops)
-            metronomeNode.play()
-        } catch { interrupt() }
+        metronomePitch.rate = rate
+        metronomeNode.play(at: AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: hostStart)))
     }
 
     private func clickBuffer(accent: Bool) -> AVAudioPCMBuffer? {
@@ -448,6 +486,10 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
 
     private var currentPosition: TimeInterval {
         guard isPlaying else { return pausedPosition }
+        return playbackPosition(at: elapsed)
+    }
+
+    private func playbackPosition(at elapsed: TimeInterval) -> TimeInterval {
         guard let range = playbackLoop else { return min(startPosition + elapsed, duration) }
         let firstLength = range.upperBound - startPosition
         if elapsed < firstLength { return startPosition + elapsed }
@@ -519,6 +561,7 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
     private func stopNodes() {
         for track in tracks.values { track.node.stop() }
         for player in patches.values { player.node.stop() }
+        metronomeNode.stop()
     }
 
     private func startEngine() throws {
@@ -534,6 +577,7 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
         startPosition = loopRange.map { $0.contains(position) && position < $0.upperBound ? position : $0.lowerBound } ?? position
         scheduledUntil = 0
         wrappedLoops = 0
+        metronomeStartElapsed = 0
         if let range = playbackLoop {
             schedulePass(from: startPosition, to: range.upperBound, offset: 0)
             scheduledUntil = range.upperBound - startPosition
@@ -554,6 +598,7 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
         let time = AVAudioTime(hostTime: hostStart)
         for track in tracks.values { track.node.play(at: time) }
         for player in patches.values { player.node.play(at: time) }
+        if isMetronomeEnabled { metronomeNode.play(at: time) }
         hostAnchor = AVAudioTime.seconds(forHostTime: hostStart)
         elapsedAtAnchor = 0
         isPlaying = true
@@ -581,6 +626,7 @@ final class AudioService: NSObject, AVAudioRecorderDelegate {
             }
             schedule(track.node, file: track.file, source: cursor, length: end - cursor, offset: offset + cursor - start)
         }
+        scheduleMetronome(from: start, to: end, offset: offset - metronomeStartElapsed)
     }
 
     private func schedule(_ node: AVAudioPlayerNode, file: AVAudioFile, source: TimeInterval, length: TimeInterval, offset: TimeInterval) {

@@ -20,7 +20,11 @@ struct PracticeFeature {
         var candidates: [FeedbackItem] = []    // 미정: 후보를 채우는 시점
         var isMetronomeEnabled: Bool = false   // 미정: 기본값
         var metronomeVolume: Int = 100         // 미정: 기본값 (0~100)
-        var metronomeBPM: Double = 120         // 미정: 기본값 (0보다 큼). 곡이 열리면 곡 BPM으로 바뀜
+        var metronomeBPM: Int = 120            // 100% 속도 기준 BPM. 곡 BPM을 기본값으로 쓴다.
+
+        var displayedMetronomeBPM: Int {
+            Int((Double(metronomeBPM) * Double(tempo)).rounded())
+        }
     }
     
     nonisolated private enum CancelID: Hashable, Sendable {
@@ -30,16 +34,17 @@ struct PracticeFeature {
     @Dependency(\.audioClient) var audioClient
     
     enum Action: Sendable {
-        case songOpened(bpm: Double)
+        case songOpened(bpm: Int)
         case feedbackSelected(feedbackID: UUID, range: ClosedRange<TimeInterval>)
         case practiceRangeChanged(range: ClosedRange<TimeInterval>)
+        case loopTapped(duration: TimeInterval, selectedRange: ClosedRange<TimeInterval>?)
         case loopOnTapped
         case loopOffTapped
         case tempoChanged(Float)
         case metronomeOnTapped
         case metronomeOffTapped
         case metronomeVolumeChanged(Int)
-        case metronomeBPMChanged(Double)
+        case metronomeBPMChanged(Int) // 현재 속도에서 화면에 표시되는 BPM
         case practiceRequested(FeedbackItem)
         case practiceStartTapped
         case candidateSelected(id: FeedbackItem.ID)
@@ -64,7 +69,7 @@ struct PracticeFeature {
                 state.tempo = 1.0
                 state.stage = .idle
                 state.candidates = []
-                // 메트로놈이 켜져 있던 경우 처리는 미정
+                // 엔진도 곡을 로드할 때 같은 BPM과 첫 박 위치를 받는다.
                 return .none
                 
             case let .feedbackSelected(feedbackID, range):
@@ -78,15 +83,27 @@ struct PracticeFeature {
                 // 반복이 켜진 중에 구간이 바뀌면 다시 보낼지 미정
                 return .none
                 
+            case let .loopTapped(duration, selectedRange):
+                if state.isLoopEnabled {
+                    return .send(.loopOffTapped)
+                }
+                guard duration.isFinite, duration > 0 else { return .none }
+                let range = selectedRange ?? 0...duration
+                guard range.lowerBound.isFinite, range.upperBound.isFinite,
+                      range.lowerBound >= 0, range.upperBound <= duration,
+                      range.lowerBound < range.upperBound else { return .none }
+
+                state.practiceRange = range
+                return .send(.loopOnTapped)
+
             case .loopOnTapped:
+                guard let range = state.practiceRange else { return .none }
                 state.isLoopEnabled = true
-                // practiceRange가 없을 때의 동작은 미정
-                return .send(.delegate(.playback(.loop(state.practiceRange))))
+                return .send(.delegate(.playback(.loop(range))))
                 
             case .loopOffTapped:
                 state.isLoopEnabled = false
-                // 반복 끄기 명령을 어떻게 보낼지 미정 (.loop(nil)?)
-                return .none
+                return .send(.delegate(.playback(.loop(nil))))
                 
             case let .tempoChanged(tempo):
                 state.tempo = tempo
@@ -101,13 +118,13 @@ struct PracticeFeature {
                 return setMetronome(state: state)
                 
             case let .metronomeVolumeChanged(volume):
-                // 0~100 범위를 벗어난 값 처리는 미정
-                state.metronomeVolume = volume
+                state.metronomeVolume = min(max(volume, 0), 100)
                 return setMetronome(state: state)
                 
             case let .metronomeBPMChanged(bpm):
-                // 0 이하 값 처리는 미정
-                state.metronomeBPM = bpm
+                guard bpm > 0, state.tempo.isFinite, state.tempo > 0 else { return .none }
+                // 엔진이 재생 속도를 적용하므로, 입력값은 100% 기준으로 되돌려 전달한다.
+                state.metronomeBPM = max(1, Int((Double(bpm) / Double(state.tempo)).rounded()))
                 return setMetronome(state: state)
                 
             case .practiceRequested:

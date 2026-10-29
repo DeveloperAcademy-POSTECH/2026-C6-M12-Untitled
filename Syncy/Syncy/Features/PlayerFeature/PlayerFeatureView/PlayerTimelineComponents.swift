@@ -29,7 +29,7 @@ struct PlaybackPositionView: View {
         .lineLimit(1)
         .padding(.horizontal, 12)
         .frame(width: 140, height: 34)
-        .background(Color("Surface3"))
+        .background(Color("Surface3"), in: RoundedRectangle(cornerRadius: 8))
     }
 }
 
