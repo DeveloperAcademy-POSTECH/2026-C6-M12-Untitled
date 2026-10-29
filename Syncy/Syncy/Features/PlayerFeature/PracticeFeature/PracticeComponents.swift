@@ -42,9 +42,8 @@ struct PracticeIconButton: View {
 
 struct PlaybackSpeedButton: View {
     let rate: Float
+    @Binding var isPresented: Bool
     let onRateChanged: (Float) -> Void
-
-    @State private var isPresented = false
 
     private let rates: [Float] = [0.8, 0.9, 1.0]
 
@@ -75,7 +74,6 @@ struct PlaybackSpeedButton: View {
         .buttonStyle(.plain)
         .overlay(alignment: .topLeading) {
             if isPresented {
-                // 버튼의 보이는 아래 끝(39pt)에서 8pt 띄운다.
                 speedOptions.offset(y: 47)
             }
         }
@@ -123,7 +121,12 @@ struct PlaybackSpeedButton: View {
         }
         .padding(6)
         .frame(width: 156)
-        .background(Color("Surface2"), in: RoundedRectangle(cornerRadius: 12))
+        .background {
+            // 창 안의 빈 곳을 눌러도 바깥 영역의 닫기 동작으로 전달하지 않는다.
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color("Surface2"))
+                .onTapGesture {}
+        }
         .overlay {
             RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(Color("Surface4"), lineWidth: 1)
@@ -136,11 +139,11 @@ struct MetronomeSettingsButton: View {
     let isEnabled: Bool
     let bpm: Int
     let volume: Int
+    @Binding var isPresented: Bool
     let onEnabledChanged: (Bool) -> Void
     let onBPMChanged: (Int) -> Void
     let onVolumeChanged: (Int) -> Void
 
-    @State private var isPresented = false
     @State private var bpmText = ""
     @FocusState private var isBPMFocused: Bool
 
@@ -148,12 +151,6 @@ struct MetronomeSettingsButton: View {
 
     var body: some View {
         PracticeIconButton(kind: .metronome, isActive: isEnabled) {
-            if isPresented {
-                commitBPM()
-            } else {
-                bpmText = String(bpm)
-            }
-            isBPMFocused = false
             isPresented.toggle()
         }
         .overlay(alignment: .topLeading) {
@@ -162,8 +159,16 @@ struct MetronomeSettingsButton: View {
             }
         }
         .zIndex(isPresented ? 1 : 0)
+        .onChange(of: isPresented) { _, isPresented in
+            if isPresented {
+                bpmText = String(bpm)
+            } else {
+                commitBPM()
+                isBPMFocused = false
+            }
+        }
         .onChange(of: isBPMFocused) { _, isFocused in
-            if !isFocused { commitBPM() }
+            if !isFocused, isPresented { commitBPM() }
         }
         .onChange(of: bpm) { _, value in
             if !isBPMFocused {
@@ -235,7 +240,11 @@ struct MetronomeSettingsButton: View {
         .foregroundStyle(Color("Gray100"))
         .padding(12)
         .frame(width: 244)
-        .background(Color("Surface2"), in: RoundedRectangle(cornerRadius: 12))
+        .background {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color("Surface2"))
+                .onTapGesture { isBPMFocused = false }
+        }
         .overlay {
             RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(Color("Surface4"), lineWidth: 1)
