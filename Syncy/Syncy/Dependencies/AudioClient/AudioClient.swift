@@ -10,7 +10,7 @@ import Foundation
 
 @DependencyClient
 struct AudioClient {
-    var load: (_ tracks: [SongTrack]) async throws -> TimeInterval
+    var load: (_ tracks: [SongTrack], _ beatGrid: BeatGrid) async throws -> TimeInterval
     var play: () async throws -> Void
     var pause: () async -> Void
     var seek: (_ time: TimeInterval) async -> Void
@@ -44,7 +44,7 @@ extension AudioClient: DependencyKey {
     static let liveValue: Self = {
         let service = AudioService()
         return Self(
-            load: { try await service.load($0) },
+            load: { try await service.load($0, beatGrid: $1) },
             play: { try service.play() },
             pause: { service.pause() },
             seek: { service.seek($0) },

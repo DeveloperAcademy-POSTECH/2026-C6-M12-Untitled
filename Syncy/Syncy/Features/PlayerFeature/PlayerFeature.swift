@@ -145,20 +145,21 @@ struct PlayerFeature {
                     }
                 )
                 
-                state.beatGrid = BeatGrid(
+                let beatGrid = BeatGrid(
                     bpm: song.bpm,
                     firstBeatOffset: song.firstBeatOffset
                 )
+                state.beatGrid = beatGrid
                 
                 let loadEffect: Effect<Action> = .run {
-                    [audioClient, tracks = song.tracks] send in
+                    [audioClient, tracks = song.tracks, beatGrid] send in
                     do {
                         await audioClient.cancelRecording()
                         try Task.checkCancellation()
                         await audioClient.pause()
                         try Task.checkCancellation()
                         
-                        let duration = try await audioClient.load(tracks)
+                        let duration = try await audioClient.load(tracks, beatGrid)
                         try Task.checkCancellation()
                         
                         await send(.loadResponse(duration: duration))
